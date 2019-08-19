@@ -113,7 +113,7 @@ module.exports = function(strapi) {
                     isSrv ? '+srv' : ''
                   }://${username}:${password}@${host}${
                     !isSrv ? ':' + port : ''
-                  }/`,
+                  }/${database}`,
                 connectOptions,
               );
             } catch ({ message }) {
