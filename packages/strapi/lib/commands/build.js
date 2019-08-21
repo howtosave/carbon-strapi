@@ -29,7 +29,8 @@ module.exports = async () => {
 
   const serverConfig = await loadConfigFile(envConfigDir, 'server.+(js|json)');
 
-  const adminPath = _.get(serverConfig, 'admin.path', '/admin');
+  const routerPrefix = _.get(serverConfig, 'router.prefix', '');
+  const adminPath = routerPrefix + _.get(serverConfig, 'admin.path', '/admin');
   const adminBackend = _.get(serverConfig, 'admin.build.backend', '/');
 
   console.log(`Building your admin UI with ${green(env)} configuration ...`);
