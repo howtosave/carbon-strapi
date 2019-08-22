@@ -27,6 +27,7 @@ module.exports = strapi => {
         strapi.config.middleware.settings.public.path ||
           strapi.config.paths.static
       );
+      const prefix = _.get(strapi.config.currentEnvironment.request, 'router.prefix', '');
 
       // Serve /public index page.
       strapi.router.route({
@@ -34,7 +35,7 @@ module.exports = strapi => {
         path: '/',
         handler: [
           async (ctx, next) => {
-            ctx.url = path.basename(`${ctx.url}/index.html`);
+            ctx.url = path.join(prefix, 'index.html');
 
             await next();
           },
