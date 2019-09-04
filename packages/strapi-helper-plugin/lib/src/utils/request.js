@@ -83,7 +83,7 @@ function formatQueryParams(params) {
  */
 function serverRestartWatcher(response) {
   return new Promise(resolve => {
-    fetch(`${strapi.backendURL}/_health`, {
+    fetch(`${strapi.backendURL}/_ping`, {
       method: 'HEAD',
       mode: 'no-cors',
       headers: {
