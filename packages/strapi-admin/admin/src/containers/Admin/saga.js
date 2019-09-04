@@ -7,6 +7,7 @@ import { EMIT_EVENT, GET_INIT_DATA, GET_SECURED_DATA } from './constants';
 import { makeSelectUuid } from './selectors';
 
 export function* emitter(action) {
+/* 불필요한 코드 제거함 (Usage log 전송 기능)  
   try {
     const requestURL = 'https://analytics.strapi.io/track';
     const uuid = yield select(makeSelectUuid());
@@ -28,18 +29,20 @@ export function* emitter(action) {
   } catch (err) {
     console.log(err); // eslint-disable-line no-console
   }
+*/  
 }
 
 export function* getData() {
+/* 불필요한 코드 제거함 (Usage log 전송 기능) */  
   try {
     const endPoints = [
-      'gaConfig',
+//      'gaConfig',
       'strapiVersion',
       'currentEnvironment',
       'layout',
     ];
     const [
-      { uuid },
+//      { uuid },
       { strapiVersion },
       { autoReload, currentEnvironment },
       { layout },
@@ -52,7 +55,7 @@ export function* getData() {
     yield put(
       getInitDataSucceeded({
         autoReload,
-        uuid,
+//        uuid,
         strapiVersion,
         currentEnvironment,
         layout,

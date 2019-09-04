@@ -16,12 +16,6 @@
     },
     {
       "method": "GET",
-      "path": "/gaConfig",
-      "handler": "Admin.getGaConfig",
-      "policies": []
-    },
-    {
-      "method": "GET",
       "path": "/strapiVersion",
       "handler": "Admin.getStrapiVersion",
       "policies": []

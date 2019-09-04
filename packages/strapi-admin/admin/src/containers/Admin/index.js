@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import ReactGA from 'react-ga';
+//import ReactGA from 'react-ga';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
@@ -88,9 +88,11 @@ export class Admin extends React.Component {
     // Initialize Google Analytics
     // Refer to ../../../doc/disable-tracking.md for more information
     /* istanbul ignore next */
+    /* 불필요한 코드 제거함 (Usage log 전송 기능)
     ReactGA.initialize('UA-54313258-9', {
       testMode: process.env.NODE_ENV === 'test',
     });
+    */
     // Retrieve the main settings of the application
     this.props.getInitData();
   }
@@ -112,13 +114,14 @@ export class Admin extends React.Component {
 
     if (prevProps.location.pathname !== pathname) {
       getHook('willSecure');
-
       /* istanbul ignore if */
+      /* 불필요한 코드 제거함 (Usage log 전송 기능)
       if (this.isAcceptingTracking()) {
         ReactGA.pageview(pathname, {
           testMode: process.env.NODE_ENV === 'test',
         });
       }
+      */
     }
 
     if (prevProps.admin.isSecured !== isSecured && isSecured) {
@@ -174,6 +177,7 @@ export class Admin extends React.Component {
     updatePlugin: this.props.updatePlugin,
   };
 
+  /* 불필요한 코드 제거함 (Usage log 전송 기능)
   isAcceptingTracking = () => {
     const {
       admin: { uuid },
@@ -181,7 +185,7 @@ export class Admin extends React.Component {
 
     return !!uuid;
   };
-
+  */
   /**
    * Display the app loader until the app is ready
    * @returns {Boolean}
