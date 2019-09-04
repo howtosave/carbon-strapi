@@ -24,10 +24,9 @@ module.exports = strapi => {
       _.forEach(strapi.config.routes, value => {
         composeEndpoint(value, null, strapi.router);
       });
-
-      strapi.router.prefix(
-        _.get(strapi.config, 'currentEnvironment.request.router.prefix', '')
-      );
+      // API, admin 및 plugins의 router에 prefix를 적용함
+      const prefix = _.get(strapi.config, 'currentEnvironment.request.router.prefix', '');
+      strapi.router.prefix(prefix);
 
       if (!_.isEmpty(_.get(strapi.admin, 'config.routes', false))) {
         // Create router for admin.
@@ -39,7 +38,8 @@ module.exports = strapi => {
         });
 
         // router.prefix(strapi.config.admin.path || `/${strapi.config.paths.admin}`);
-        router.prefix('/admin');
+        // admin router에 prefix를 적용함
+        router.prefix(`${prefix}/admin`);
 
         // TODO:
         // - Mount on main router `strapi.router.use(routerAdmin.middleware());`
@@ -65,8 +65,8 @@ module.exports = strapi => {
               composeEndpoint(value, name, router);
             }
           );
-
-          router.prefix(`/${name}`);
+          // plugins router에 prefix를 적용함
+          router.prefix(`${prefix}/${name}`);
 
           // /!\ Could override main router's routes.
           if (!_.isEmpty(excludedRoutes)) {
