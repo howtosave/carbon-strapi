@@ -13,7 +13,8 @@ const alias = [
   'react-dnd',
   'react-dnd-html5-backend',
   'react-dom',
-  'react-ga',
+  // 불필요한 코드 제거함 (Usage log 전송 기능)
+  //'react-ga',
   'react-helmet',
   'react-loadable',
   'react-redux',
