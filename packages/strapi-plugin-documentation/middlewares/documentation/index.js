@@ -59,7 +59,7 @@ module.exports = strapi => {
 
       strapi.router.route({
         method: 'GET',
-        path: '/plugins/documentation/*.*',
+        path: '/documentation/*.*',
         handler: [
           async (ctx, next) => {
             ctx.url = path.basename(ctx.url);

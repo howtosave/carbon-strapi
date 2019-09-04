@@ -29,7 +29,7 @@ module.exports = strapi => {
           const start = Date.now();
           await next();
           const delta = Math.ceil(Date.now() - start);
-          strapi.log.debug(`${ctx.method} ${ctx.url} (${delta} ms)`);
+          strapi.log.debug(`${ctx.method} ${ctx.url} (${delta} ms -> ${ctx.status})`);
         });
       }
     },
