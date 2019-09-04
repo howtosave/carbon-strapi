@@ -227,7 +227,7 @@ class Strapi extends EventEmitter {
 
   async load() {
     await this.enhancer();
-
+    /* 불필요한 middleware 제거함
     this.app.use(async (ctx, next) => {
       if (ctx.request.url === '/_health' && ctx.request.method === 'HEAD') {
         ctx.set('strapi', 'You are so French!');
@@ -235,7 +235,7 @@ class Strapi extends EventEmitter {
       } else {
         await next();
       }
-    });
+    });*/
 
     const [
       config,

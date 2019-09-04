@@ -16934,66 +16934,6 @@ stealthy-require@^1.1.1:
   resolved "https://registry.yarnpkg.com/stealthy-require/-/stealthy-require-1.1.1.tgz#35b09875b4ff49f26a777e509b3090a3226bf24b"
   integrity sha1-NbCYdbT/SfJqd35QmzCQoyJr8ks=
 
-"strapi-helper-plugin@file:packages/strapi-helper-plugin":
-  version "3.0.0-beta.15"
-  dependencies:
-    bootstrap "^4.0.0-alpha.6"
-    classnames "^2.2.5"
-    immutable "^3.8.2"
-    invariant "^2.2.1"
-    lodash "^4.17.5"
-    moment "^2.16.0"
-    react "^16.0.0"
-    react-datetime "^2.16.3"
-    react-dom "^16.0.0"
-    react-intl "^2.8.0"
-    react-router "^5.0.0"
-    react-router-dom "^5.0.0"
-    reactstrap "^5.0.0"
-    whatwg-fetch "^2.0.3"
-
-strapi-plugin-users-permissions@3.0.0-beta.15:
-  version "3.0.0-beta.15"
-  resolved "https://registry.yarnpkg.com/strapi-plugin-users-permissions/-/strapi-plugin-users-permissions-3.0.0-beta.15.tgz#c85f2f4e99d9e66f0473ed0295ece10412ca3b2d"
-  integrity sha512-l7rlw131QUqCvLvbp1AptqkJj/wzjA033tXAl0bufM+iDt75p2vfuhYYFf5n9+zPlMoBsAFxoEe5ZwJsPpO8zA==
-  dependencies:
-    bcryptjs "^2.4.3"
-    classnames "^2.2.6"
-    grant-koa "^4.6.0"
-    immutable "^3.8.2"
-    invariant "^2.2.1"
-    jsonwebtoken "^8.1.0"
-    koa2-ratelimit "^0.9.0"
-    lodash "^4.17.11"
-    purest "^2.0.1"
-    react "^16.0.0"
-    react-dom "^16.0.0"
-    react-intl "^2.8.0"
-    react-redux "^7.0.2"
-    react-router "^5.0.0"
-    react-router-dom "^5.0.0"
-    react-transition-group "^2.5.0"
-    reactstrap "^5.0.0"
-    redux-saga "^0.16.0"
-    request "^2.83.0"
-    strapi-helper-plugin "3.0.0-beta.15"
-    strapi-utils "3.0.0-beta.15"
-    uuid "^3.1.0"
-
-"strapi-provider-upload-local@file:packages/strapi-provider-upload-local":
-  version "3.0.0-beta.15"
-
-"strapi-utils@file:packages/strapi-utils":
-  version "3.0.0-beta.15"
-  dependencies:
-    commander "^2.20.0"
-    joi-json "^2.1.0"
-    knex "^0.16.5"
-    lodash "^4.17.11"
-    pino "^4.7.1"
-    pluralize "^7.0.0"
-    shelljs "^0.8.3"
-
 stream-browserify@^2.0.1:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/stream-browserify/-/stream-browserify-2.0.2.tgz#87521d38a44aa7ee91ce1cd2a47df0cb49dd660b"
