@@ -23,7 +23,7 @@
     "react-router-dom": "^5.0.0",
     "react-transition-group": "^2.5.0",
     "reactstrap": "^5.0.0",
-    "strapi-helper-plugin": "file:../strapi-helper-plugin",
+    "strapi-helper-plugin": "3.0.0-beta.15",
     "strapi-provider-upload-local": "file:../strapi-provider-upload-local",
     "strapi-utils": "file:../strapi-utils",
     "stream-to-array": "^2.3.0",
