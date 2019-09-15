@@ -31,7 +31,7 @@ module.exports = async () => {
   // backend path를 prefix로 적용
   const routerPrefix = _.get(serverConfig, 'admin.build.backend', '/');
 
-  const adminPath = path.join(routerPrefix, _.get(serverConfig, 'admin.path', '/admin'));
+  const adminPath = path.posix.join(routerPrefix, _.get(serverConfig, 'admin.path', '/admin'));
   const adminBackend = _.get(serverConfig, 'admin.build.backend', '/');
 
   // 추가 정보 출력함
