@@ -38,16 +38,16 @@ module.exports = {
       ]);
     }
   },
-
-  async getGaConfig(ctx) {
+  /* 불필요한 코드 제거함 (Usage log 전송 기능)
+  getGaConfig: async ctx => {
     try {
       ctx.send({ uuid: _.get(strapi.config, 'uuid', false) });
     } catch (err) {
       ctx.badRequest(null, [{ messages: [{ id: 'An error occurred' }] }]);
     }
   },
-
-  async getLayout(ctx) {
+  */
+  getLayout: async ctx => {
     try {
       const layout = require('../config/layout.js');
 

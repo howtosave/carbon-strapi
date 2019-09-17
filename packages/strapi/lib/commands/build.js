@@ -28,11 +28,14 @@ module.exports = async () => {
   }
 
   const serverConfig = await loadConfigFile(envConfigDir, 'server.+(js|json)');
+  // backend path를 prefix로 적용
+  const routerPrefix = _.get(serverConfig, 'admin.build.backend', '/');
 
-  const adminPath = _.get(serverConfig, 'admin.path', '/admin');
+  const adminPath = path.posix.join(routerPrefix, _.get(serverConfig, 'admin.path', '/admin'));
   const adminBackend = _.get(serverConfig, 'admin.build.backend', '/');
 
-  console.log(`Building your admin UI with ${green(env)} configuration ...`);
+  // 추가 정보 출력함
+  console.log(`Building your admin UI with ${green(env)} configuration path: ${adminPath}, backend: ${adminBackend}...`);
 
   return strapiAdmin
     .build({

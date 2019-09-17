@@ -24,16 +24,16 @@ module.exports = strapi => {
       _.forEach(strapi.config.routes, value => {
         composeEndpoint(value, null, strapi.router);
       });
-
-      strapi.router.prefix(
-        _.get(strapi.config, 'currentEnvironment.request.router.prefix', '')
-      );
+      // API, admin 및 plugins의 router에 prefix를 적용함
+      const prefix = _.get(strapi.config, 'currentEnvironment.request.router.prefix', '');
+      strapi.router.prefix(prefix);
 
       if (!_.isEmpty(_.get(strapi.admin, 'config.routes', false))) {
         // Create router for admin.
         // Prefix router with the admin's name.
+        // admin router에 prefix를 적용함
         const router = new Router({
-          prefix: '/admin',
+          prefix: `${prefix}/admin`,
         });
 
         _.forEach(strapi.admin.config.routes, value => {
@@ -47,8 +47,9 @@ module.exports = strapi => {
       if (strapi.plugins) {
         // Parse each plugin's routes.
         _.forEach(strapi.plugins, (plugin, name) => {
+          // plugins router에 prefix를 적용함
           const router = new Router({
-            prefix: `/${name}`,
+            prefix: `${prefix}/${name}`,
           });
 
           // Exclude routes with prefix.

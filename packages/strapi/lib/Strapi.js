@@ -256,8 +256,7 @@ class Strapi extends EventEmitter {
     await this.enhancer();
 
     this.app.use(async (ctx, next) => {
-      if (ctx.request.url === '/_health' && ctx.request.method === 'HEAD') {
-        ctx.set('strapi', 'You are so French!');
+      if (ctx.request.url === '/_ping' && ctx.request.method === 'HEAD') {
         ctx.status = 204;
       } else {
         await next();

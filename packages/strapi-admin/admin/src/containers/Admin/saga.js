@@ -4,6 +4,7 @@ import { EMIT_EVENT } from './constants';
 import { makeSelectUuid } from '../App/selectors';
 
 export function* emitter(action) {
+/* 불필요한 코드 제거함 (Usage log 전송 기능)  
   try {
     const requestURL = 'https://analytics.strapi.io/track';
     const uuid = yield select(makeSelectUuid());
@@ -25,6 +26,7 @@ export function* emitter(action) {
   } catch (err) {
     console.log(err); // eslint-disable-line no-console
   }
+*/  
 }
 
 // Individual exports for testing
