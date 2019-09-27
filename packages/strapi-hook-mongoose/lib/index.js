@@ -95,7 +95,7 @@ module.exports = function(strapi) {
             uri ||
               `mongodb${isSrv ? '+srv' : ''}://${username}:${password}@${host}${
                 !isSrv ? ':' + port : ''
-              }//${database}`,
+              }/${database}`,
             connectOptions
           );
         } catch (error) {
