@@ -55,7 +55,7 @@
     "strapi-generate-plugin": "3.0.0-beta.16.6",
     "strapi-generate-policy": "3.0.0-beta.16.6",
     "strapi-generate-service": "3.0.0-beta.16.6",
-    "strapi-utils": "file:../strapi-utils"
+    "strapi-utils": "3.0.0-beta.16.6"
   },
   "scripts": {
     "test": "jest --verbose",
