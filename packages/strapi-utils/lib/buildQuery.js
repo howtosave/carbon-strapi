@@ -103,6 +103,7 @@ const castValue = ({ type, value, operator }) => {
  */
 const buildQuery = ({ model, filters = {}, ...rest }) => {
   // Validate query clauses
+
   if (filters.where && Array.isArray(filters.where)) {
     const deepFilters = filters.where.filter(
       ({ field }) => field.split('.').length > 1
@@ -115,7 +116,10 @@ const buildQuery = ({ model, filters = {}, ...rest }) => {
 
     // cast where clauses to match the inner types
     filters.where = filters.where
-      .filter(({ value }) => !_.isNil(value))
+      // [PK] bug fix:
+      // 아래 코드는 검색 조건(where)에서 값이 null 또는 undefined인 항목을 제거한다.
+      // 따라서 field 값이 null 또는 undefined인 row를 검색 시 문제가 발생한다.
+      //.filter(({ value }) => !_.isNil(value))
       .map(({ field, operator, value }) => {
         const { model: assocModel, attribute } = getAssociationFromFieldKey({
           model,
@@ -123,6 +127,10 @@ const buildQuery = ({ model, filters = {}, ...rest }) => {
         });
 
         const { type } = _.get(assocModel, ['attributes', attribute], {});
+
+        // [PK] TODO: fix CastError
+        // Cast to ObjectId failed for value "" at path "parent" for model
+        // console.log('>>>>>>>>>> TYPE: ', type, field);
 
         // cast value or array of values
         const castedValue = Array.isArray(value)
