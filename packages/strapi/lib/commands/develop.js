@@ -91,6 +91,8 @@ function watchFileChanges({ dir, strapiInstance }) {
       strapiInstance.reload();
     }
   };
+  const { strapiWatchConfig } = require(`${dir}/package.json`);
+  const { ignore = [], delay = 100 } = strapiWatchConfig;
 
   const watcher = chokidar.watch(dir, {
     ignoreInitial: true,
@@ -113,7 +115,9 @@ function watchFileChanges({ dir, strapiInstance }) {
       '**/cypress/**',
       '**/*.db*',
       '**/exports/**',
+      ...ignore,
     ],
+    atomic: delay,
   });
 
   watcher
