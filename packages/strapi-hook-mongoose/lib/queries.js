@@ -194,7 +194,7 @@ module.exports = ({ model, modelKey, strapi }) => {
     const populateOpt = populate || defaultPopulate;
 
     const filters = convertRestQueryParams(params);
-
+    //strapi.log.debug('[PTK]>>> mongoose-queries.js#find(): filters:', filters);
     return buildQuery({
       model,
       filters,

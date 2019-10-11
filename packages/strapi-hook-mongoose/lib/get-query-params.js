@@ -5,6 +5,7 @@ const _ = require('lodash');
 module.exports = (value, type, key) => {
   const result = {};
 
+  console.log(`>>> get-query-params.js: ${type}: ${key}=${value}`);
   switch (type) {
     case '=':
       result.key = `where.${key}`;
@@ -65,6 +66,11 @@ module.exports = (value, type, key) => {
     case '_nin':
       result.key = `where.${key}.$nin`;
       result.value = _.castArray(value);
+      break;
+    // [PTK] add _select for query projection
+    case '_select':
+      result.key = 'select';
+      result.value = value ? value.split(',') : [];
       break;
     default:
       return undefined;

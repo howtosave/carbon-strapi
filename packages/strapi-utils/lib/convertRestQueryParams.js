@@ -35,8 +35,12 @@ const convertRestQueryParams = (params = {}, defaults = {}) => {
   if (_.has(params, '_limit')) {
     Object.assign(finalParams, convertLimitQueryParams(params._limit));
   }
+  // [PTK] add _select for projection
+  if (_.has(params, '_select')) {
+    Object.assign(finalParams, convertSelectQueryParams(params._select));
+  }
 
-  const whereParams = _.omit(params, ['_sort', '_start', '_limit']);
+  const whereParams = _.omit(params, ['_sort', '_start', '_limit', '_select']);
 
   if (_.keys(whereParams).length > 0)
     Object.assign(finalParams, {
@@ -115,6 +119,16 @@ const convertLimitQueryParams = limitQuery => {
 
   return {
     limit: limitAsANumber,
+  };
+};
+
+/**
+ * Select query parser
+ * @param {string} selectQuery - ex: id,price,desc
+ */
+const convertSelectQueryParams = selectQuery => {
+  return {
+    select: selectQuery ? selectQuery.split(',') : [],
   };
 };
 

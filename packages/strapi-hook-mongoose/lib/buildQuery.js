@@ -157,6 +157,11 @@ const applyQueryParams = ({ query, filters }) => {
     query = query.limit(filters.limit);
   }
 
+  // [PTK] Apply select param
+  if (_.has(filters, 'select') && filters.select.length > 0) {
+    query = query.select(filters.select.join(' '));
+  }
+
   return query;
 };
 
