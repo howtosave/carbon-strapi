@@ -103,7 +103,6 @@ const castValue = ({ type, value, operator }) => {
  */
 const buildQuery = ({ model, filters = {}, ...rest }) => {
   // Validate query clauses
-
   if (filters.where && Array.isArray(filters.where)) {
     const deepFilters = filters.where.filter(
       ({ field }) => field.split('.').length > 1

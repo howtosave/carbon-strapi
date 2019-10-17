@@ -108,6 +108,8 @@ function watchFileChanges({ dir, strapiInstance }) {
       strapiInstance.reload();
     }
   };
+
+  // [PTK] add watch-config to ignore some files
   const { strapiWatchConfig } = require(`${dir}/package.json`);
   const { ignore = [], delay = 100 } = strapiWatchConfig;
 
