@@ -60,6 +60,8 @@ module.exports = strapi => {
         })
       );
 
+      if (!strapi.config.serveAdminPanel) return;
+
       const basename = _.get(
         strapi.config.currentEnvironment.server,
         'admin.path'
