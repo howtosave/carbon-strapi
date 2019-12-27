@@ -109,8 +109,9 @@ function watchFileChanges({ dir, strapiInstance }) {
     }
   };
 
-  // [PTK] add watch-config to ignore some files
-  const { strapiWatchConfig } = require(`${dir}/package.json`);
+  // [PTK] add watch-config to ignore some files.
+  //       strapiWatchConfig can be NULL.
+  const { strapiWatchConfig = {} } = require(`${dir}/package.json`);
   const { ignore = [], delay = 100 } = strapiWatchConfig;
 
   const watcher = chokidar.watch(dir, {
