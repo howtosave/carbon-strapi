@@ -3,7 +3,7 @@
 Strapi gives you the option to choose the most appropriate database for your project. It currently supports **PostgreSQL**, **MongoDB**, **SQLite**, **MySQL** and
 **MariaDB**. The following documentation covers how to install these databases locally (for development purposes) and on various hosted or cloud server solutions (for staging or production purposes).
 
-:::note
+::: tip
 Deploying **Strapi** itself is covered in the [Deployment Guide](deployment.md).
 :::
 
@@ -172,7 +172,7 @@ MongoDB must already be running in the background.
 ::: tab yarn
 
 ```
-yarn create strapi-app new my-project
+yarn create strapi-app my-project
 ```
 
 :::
@@ -320,7 +320,7 @@ Replace the contents of `/database.json` with the following and replace **< pass
   "defaultConnection": "default",
   "connections": {
     "default": {
-      "connector": "strapi-hook-mongoose",
+      "connector": "mongoose",
       "settings": {
         "uri": "mongodb://paulbocuse:<password>@strapidatabase-shard-00-00-fxxx6c.mongodb.net:27017,strapidatabase-shard-00-01-fxxxc.mongodb.net:27017,strapidatabase-shard-00-02-fxxxc.mongodb.net:27017/test?ssl=true&replicaSet=strapidatabase-shard-0&authSource=admin&retryWrites=true&w=majority"
       },

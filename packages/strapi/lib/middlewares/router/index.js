@@ -7,13 +7,13 @@
 // Public node modules.
 const _ = require('lodash');
 const Router = require('koa-router');
-
+const createEndpointComposer = require('./utils/composeEndpoint');
 /**
  * Router hook
  */
 
 module.exports = strapi => {
-  const composeEndpoint = require('./utils/composeEndpoint')(strapi);
+  const composeEndpoint = createEndpointComposer(strapi);
 
   return {
     /**
@@ -22,7 +22,7 @@ module.exports = strapi => {
 
     initialize() {
       _.forEach(strapi.config.routes, value => {
-        composeEndpoint(value, null, strapi.router);
+        composeEndpoint(value, { router: strapi.router });
       });
       // API, admin 및 plugins의 router에 prefix를 적용함
       const prefix = _.get(strapi.config, 'currentEnvironment.request.router.prefix', '');
@@ -37,7 +37,7 @@ module.exports = strapi => {
         });
 
         _.forEach(strapi.admin.config.routes, value => {
-          composeEndpoint(value, null, router);
+          composeEndpoint(value, { router });
         });
 
         // Mount admin router on Strapi router
@@ -46,10 +46,10 @@ module.exports = strapi => {
 
       if (strapi.plugins) {
         // Parse each plugin's routes.
-        _.forEach(strapi.plugins, (plugin, name) => {
+        _.forEach(strapi.plugins, (plugin, pluginName) => {
           // plugins router에 prefix를 적용함
           const router = new Router({
-            prefix: `${prefix}/${name}`,
+            prefix: `${prefix}/${pluginName}`,
           });
 
           // Exclude routes with prefix.
@@ -61,14 +61,17 @@ module.exports = strapi => {
           _.forEach(
             _.omit(plugin.config.routes, _.keys(excludedRoutes)),
             value => {
-              composeEndpoint(value, name, router);
+              composeEndpoint(value, { plugin: pluginName, router });
             }
           );
 
           // /!\ Could override main router's routes.
           if (!_.isEmpty(excludedRoutes)) {
             _.forEach(excludedRoutes, value => {
-              composeEndpoint(value, name, strapi.router);
+              composeEndpoint(value, {
+                plugin: pluginName,
+                router: strapi.router,
+              });
             });
           }
 
