@@ -297,7 +297,7 @@ class Strapi extends EventEmitter {
 
     this.app.use(async (ctx, next) => {
       // [PTK] TODO: get the prefix from the config
-      if (ctx.request.url === '/nitroapi/_health' && ctx.request.method === 'HEAD') {
+      if ( ctx.request.method === 'HEAD' && (ctx.request.url === '/_health' || ctx.request.url === '/nitroapi/_health')) {
         ctx.status = 204;
       } else {
         await next();

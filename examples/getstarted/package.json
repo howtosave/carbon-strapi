@@ -4,7 +4,8 @@
   "version": "3.0.0-beta.18.3",
   "description": "A Strapi application.",
   "scripts": {
-    "dev": "strapi develop",
+    "develop": "strapi develop",
+    "dev": "DB=mongo strapi develop",
     "start": "strapi start",
     "build": "strapi build",
     "strapi": "strapi"
