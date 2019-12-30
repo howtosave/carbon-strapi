@@ -5,7 +5,6 @@ const _ = require('lodash');
 module.exports = (value, type, key) => {
   const result = {};
 
-  console.log(`>>> get-query-params.js: ${type}: ${key}=${value}`);
   switch (type) {
     case '=':
       result.key = `where.${key}`;

@@ -42,7 +42,7 @@ module.exports = {
       ]);
     }
   },
-  /* 불필요한 코드 제거함 (Usage log 전송 기능)
+  /*[PTK] 불필요한 코드 제거함 (Usage log 전송 기능)
   getGaConfig: async ctx => {
     try {
       ctx.send({ uuid: _.get(strapi.config, 'uuid', false) });
