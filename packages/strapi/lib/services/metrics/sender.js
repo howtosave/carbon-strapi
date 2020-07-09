@@ -29,7 +29,8 @@ module.exports = strapi => {
   };
 
   return async (event, payload = {}) => {
-    try {
+    return true;
+    /*try {
       const res = await fetch('https://analytics.strapi.io/track', {
         method: 'POST',
         body: JSON.stringify({
@@ -48,6 +49,6 @@ module.exports = strapi => {
       return res.ok;
     } catch (err) {
       return false;
-    }
+    } */
   };
 };
