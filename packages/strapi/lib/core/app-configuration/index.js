@@ -1,6 +1,9 @@
 'use strict';
+
+const dotenv = require('dotenv');
+
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-require('dotenv').config({
+dotenv.config({
   path: require('fs').existsSync(`.env.${process.env.NODE_ENV}.local`)
     ? `.env.${process.env.NODE_ENV}.local`
     : `.env.${process.env.NODE_ENV}`,
