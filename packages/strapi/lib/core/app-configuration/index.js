@@ -1,6 +1,6 @@
 'use strict';
 
-const dotenv = require('dotenv-flow');
+const dotenv = require('dotenv');
 
 dotenv.config({ path: process.env.ENV_PATH, silent: true });
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
