@@ -5,11 +5,19 @@ const _ = require('lodash');
 const path = require('path');
 const fs = require('fs');
 
+const _readdirSync = (path,opt) => {
+  try {
+    return fs.readdirSync(path,opt);
+  } catch {
+    return [];
+  }
+};
+
 module.exports = dir => {
   if (!fs.existsSync(dir)) return {};
 
   const root = {};
-  const paths = fs.readdirSync(dir, { withFileTypes: true }).filter(fd => fd.isFile());
+  const paths = _readdirSync(dir, { withFileTypes: true }).filter(fd => fd.isFile());
 
   for (let fd of paths) {
     const { name } = fd;

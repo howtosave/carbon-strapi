@@ -7,6 +7,14 @@ const _ = require('lodash');
 const glob = require('../load/glob');
 const findPackagePath = require('../load/package-path');
 
+const _readdir = async path => {
+  try {
+    return await fs.promises.readdir(path);
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Load middlewares
  */
@@ -64,7 +72,7 @@ const createLoaders = strapi => {
     const pluginsDir = path.resolve(appPath, 'plugins');
     if (!fs.existsSync(pluginsDir)) return;
 
-    const pluginsNames = await fs.readdir(pluginsDir);
+    const pluginsNames = await _readdir(pluginsDir);
 
     for (let pluginFolder of pluginsNames) {
       // ignore files

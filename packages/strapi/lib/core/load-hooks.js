@@ -7,6 +7,14 @@ const _ = require('lodash');
 const glob = require('../load/glob');
 const findPackagePath = require('../load/package-path');
 
+const _readdir = async path => {
+  try {
+    return await fs.promises.readdir(path);
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Load hooks
  */
@@ -54,7 +62,7 @@ const loadLocalPluginsHooks = async (appPath, hooks) => {
   const pluginsDir = path.resolve(appPath, 'plugins');
   if (!fs.existsSync(pluginsDir)) return;
 
-  const pluginsNames = await fs.readdir(pluginsDir);
+  const pluginsNames = await _readdir(pluginsDir);
 
   for (let pluginName of pluginsNames) {
     // ignore files

@@ -5,10 +5,18 @@ const { join } = require('path');
 const { access } = require('fs').promises;
 const loadFiles = require('../load/load-files');
 
+const _exists = async path => {
+  try {
+    return await access(path);
+  } catch {
+    return false;
+  }
+};
+
 module.exports = async strapi => {
   const componentsDir = join(strapi.dir, 'components');
 
-  if (!(await access(componentsDir))) {
+  if (!(await _exists(componentsDir))) {
     return {};
   }
 
