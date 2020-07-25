@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies.
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const glob = require('../load/glob');

@@ -3,13 +3,13 @@
 const assert = require('assert');
 const _ = require('lodash');
 const path = require('path');
-const fse = require('fs-extra');
+const fs = require('fs');
 
 module.exports = dir => {
-  if (!fse.existsSync(dir)) return {};
+  if (!fs.existsSync(dir)) return {};
 
   const root = {};
-  const paths = fse.readdirSync(dir, { withFileTypes: true }).filter(fd => fd.isFile());
+  const paths = fs.readdirSync(dir, { withFileTypes: true }).filter(fd => fd.isFile());
 
   for (let fd of paths) {
     const { name } = fd;

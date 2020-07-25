@@ -1,11 +1,11 @@
 'use strict';
 
-const fse = require('fs-extra');
+const fs = require('fs');
 
 const walk = require('./walk');
 
 const loadFunctions = dir => {
-  if (!fse.existsSync(dir)) return {};
+  if (!fs.existsSync(dir)) return {};
 
   return walk(dir, { loader: loadFunction });
 };

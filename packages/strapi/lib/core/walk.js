@@ -2,13 +2,13 @@
 
 const assert = require('assert');
 const path = require('path');
-const fse = require('fs-extra');
+const fs = require('fs');
 
 module.exports = function walk(dir, { loader } = {}) {
   assert(typeof loader === 'function', 'opts.loader must be a function');
 
   const root = {};
-  const paths = fse.readdirSync(dir, { withFileTypes: true });
+  const paths = fs.readdirSync(dir, { withFileTypes: true });
 
   for (let fd of paths) {
     const { name } = fd;
