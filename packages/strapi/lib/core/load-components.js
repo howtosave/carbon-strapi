@@ -7,7 +7,8 @@ const loadFiles = require('../load/load-files');
 
 const _exists = async path => {
   try {
-    return await access(path);
+    await access(path);
+    return true;
   } catch {
     return false;
   }

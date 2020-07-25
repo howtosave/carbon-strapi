@@ -4,9 +4,9 @@ const assert = require('assert');
 const path = require('path');
 const fs = require('fs');
 
-const _readdirSync = path => {
+const _readdirSync = (path,opt) => {
   try {
-    return fs.readdirSync(path);
+    return fs.readdirSync(path,opt);
   } catch {
     return [];
   }

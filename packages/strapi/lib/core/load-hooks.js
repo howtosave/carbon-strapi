@@ -66,7 +66,7 @@ const loadLocalPluginsHooks = async (appPath, hooks) => {
 
   for (let pluginName of pluginsNames) {
     // ignore files
-    const stat = await fs.stat(path.resolve(pluginsDir, pluginName));
+    const stat = await fs.promises.stat(path.resolve(pluginsDir, pluginName));
     if (!stat.isDirectory()) continue;
 
     const dir = path.resolve(pluginsDir, pluginName, 'hooks');
