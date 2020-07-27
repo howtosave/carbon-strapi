@@ -14,13 +14,14 @@ module.exports = async ({ clean, optimization }) => {
   const dir = process.cwd();
   const config = loadConfiguration(dir);
 
-  const { serverUrl, adminPath } = getConfigUrls(config.get('server'), true);
+  const { serverUrl, adminPath, adminUrl } = getConfigUrls(config.get('server'), true);
 
   console.log(`Building your admin UI with ${green(config.environment)} configuration ...`);
 
   // [PTK] Additional Info on UI Build
   console.log(`  >>> PROXY_URL: ${green(serverUrl)}`);
-  console.log(`  >>> ADMIN_URL: ${green(adminPath)}`);
+  console.log(`  >>> ADMIN_URL: ${green(adminUrl)}`);
+  console.log(`  >>> ADMIN_PATH: ${green(adminPath)}`);
 
   if (clean) {
     await strapiAdmin.clean({ dir });

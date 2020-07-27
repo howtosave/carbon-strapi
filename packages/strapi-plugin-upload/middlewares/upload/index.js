@@ -3,12 +3,13 @@
 const { join } = require('path');
 const range = require('koa-range');
 const koaStatic = require('koa-static');
+//const Router = require('koa-router');
 
 module.exports = strapi => ({
   initialize() {
     const staticDir = join(
       strapi.dir,
-      strapi.config.middleware.settings.public.path || strapi.config.paths.static
+      strapi.config.paths.static || strapi.config.middleware.settings.public.path
     );
 
     strapi.app.on('error', err => {

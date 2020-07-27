@@ -23,7 +23,8 @@ module.exports = {
         });
       }
     };
-
+    // [PTK] fix prefix issue
+    const prefix = strapi.config.get('middleware.settings.router.prefix', '');
     return {
       upload(file) {
         verifySize(file);
@@ -31,7 +32,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
           // write file in public/assets folder
           fs.writeFile(
-            path.join(strapi.config.paths.static, `/uploads/${file.hash}${file.ext}`),
+            path.join(strapi.config.paths.static, `${prefix}/uploads/${file.hash}${file.ext}`),
             file.buffer,
             err => {
               if (err) {
@@ -49,7 +50,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
           const filePath = path.join(
             strapi.config.paths.static,
-            `/uploads/${file.hash}${file.ext}`
+            `${prefix}/uploads/${file.hash}${file.ext}`
           );
 
           if (!fs.existsSync(filePath)) {

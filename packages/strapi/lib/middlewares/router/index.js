@@ -31,7 +31,7 @@ module.exports = strapi => {
         // Create router for admin.
         // Prefix router with the admin's name.
         const router = new Router({
-          prefix: '/admin',
+          prefix: `${strapi.config.get('middleware.settings.router.prefix', '')}/admin`,
         });
 
         _.forEach(strapi.admin.config.routes, value => {
@@ -46,7 +46,7 @@ module.exports = strapi => {
         // Parse each plugin's routes.
         _.forEach(strapi.plugins, (plugin, pluginName) => {
           const router = new Router({
-            prefix: `/${pluginName}`,
+            prefix: `${strapi.config.get('middleware.settings.router.prefix', '')}/${pluginName}`,
           });
 
           (plugin.config.routes || []).forEach(route => {
