@@ -3,6 +3,7 @@
 // Dependencies.
 const http = require('http');
 const path = require('path');
+// [PTK] fse replacement
 const fs = require('fs');
 const Koa = require('koa');
 const Router = require('koa-router');
@@ -100,7 +101,7 @@ class Strapi {
 
     console.log(chalk.bold('One more thing...'));
     console.log(
-      chalk.grey('Create your first administrator ğìœŠ» by going to the administration panel at:')
+      chalk.grey('Create your first administrator ğŸ’» by going to the administration panel at:')
     );
     console.log();
 
@@ -119,13 +120,13 @@ class Strapi {
     console.log(chalk.bold('Welcome back!'));
 
     if (this.config.serveAdminPanel === true) {
-      console.log(chalk.grey('To manage your project ğìœ“€, go to the administration panel at:'));
+      console.log(chalk.grey('To manage your project ğŸš€, go to the administration panel at:'));
       const adminUrl = getAbsoluteAdminUrl(strapi.config);
       console.log(chalk.bold(adminUrl));
       console.log();
     }
 
-    console.log(chalk.grey('To access the server âìŠ’æˆª, go to:'));
+    console.log(chalk.grey('To access the server âš¡ï¸, go to:'));
     const serverUrl = getAbsoluteServerUrl(strapi.config);
     console.log(chalk.bold(serverUrl));
     console.log();
@@ -216,7 +217,7 @@ class Strapi {
   }
 
   stopWithError(err, customMessage) {
-    this.log.debug(`âì¡æˆª Server wasn't able to start properly.`);
+    this.log.debug(`â›”ï¸ Server wasn't able to start properly.`);
     if (customMessage) {
       this.log.error(customMessage);
     }

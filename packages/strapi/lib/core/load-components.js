@@ -2,9 +2,11 @@
 
 const _ = require('lodash');
 const { join } = require('path');
+// [PTK] fse replacement
 const { access } = require('fs').promises;
 const loadFiles = require('../load/load-files');
 
+// [PTK] fse replacement
 const _exists = async path => {
   try {
     await access(path);

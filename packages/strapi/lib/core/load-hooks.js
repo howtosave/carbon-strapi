@@ -1,12 +1,14 @@
 'use strict';
 
 // Dependencies.
+// [PTK] fse replacement
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const glob = require('../load/glob');
 const findPackagePath = require('../load/package-path');
 
+// [PTK] fse replacement
 const _readdir = async path => {
   try {
     return await fs.promises.readdir(path);

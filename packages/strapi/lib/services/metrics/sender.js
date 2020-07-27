@@ -29,6 +29,7 @@ module.exports = strapi => {
   };
 
   return async (event, payload = {}) => {
+    // [PTK] disable sending usage statistics
     return true;
     /*try {
       const res = await fetch('https://analytics.strapi.io/track', {

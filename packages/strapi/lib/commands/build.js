@@ -18,6 +18,10 @@ module.exports = async ({ clean, optimization }) => {
 
   console.log(`Building your admin UI with ${green(config.environment)} configuration ...`);
 
+  // [PTK] Additional Info on UI Build
+  console.log(`  >>> PROXY_URL: ${green(serverUrl)}`);
+  console.log(`  >>> ADMIN_URL: ${green(adminPath)}`);
+
   if (clean) {
     await strapiAdmin.clean({ dir });
   }

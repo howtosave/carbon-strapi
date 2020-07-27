@@ -3,6 +3,7 @@
 const assert = require('assert');
 const _ = require('lodash');
 const path = require('path');
+// [PTK] fse replacement
 const fs = require('fs');
 
 const _readdirSync = (path,opt) => {

@@ -1,5 +1,6 @@
 'use strict';
 
+// [PTK] fse replacement
 const fs = require('fs');
 
 const walk = require('./walk');

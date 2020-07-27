@@ -20,6 +20,7 @@ const LIMITED_EVENTS = [
 
 const createTelemetryInstance = strapi => {
   const uuid = strapi.config.uuid;
+  // [PTK] disable sending ping event
   const isDisabled = true; // !uuid || isTruthy(process.env.STRAPI_TELEMETRY_DISABLED);
 
   const sender = createSender(strapi);
