@@ -61,10 +61,10 @@ module.exports = strapi => {
           });
 
           // [PTK] router tracing
-          strapi.log.debug(">>>>>>>>>> PLUGIN ROUTER:", pluginName);
-          router.stack.forEach((item) => {
-            strapi.log.debug('  ', item.methods, '\t', item.path);
-          });
+          //strapi.log.debug(">>>>>>>>>> PLUGIN ROUTER:", pluginName);
+          //router.stack.forEach((item) => {
+          //  strapi.log.debug('  ', item.methods, '\t', item.path);
+          //});
         
           // Mount plugin router
           strapi.app.use(router.routes()).use(router.allowedMethods());
