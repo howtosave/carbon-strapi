@@ -46,6 +46,7 @@ module.exports = strapi => {
       if (strapi.plugins) {
         // Parse each plugin's routes.
         _.forEach(strapi.plugins, (plugin, pluginName) => {
+
           const router = new Router({
             // [PTK] fix prefix-url issue
             prefix: `${strapi.config.get('middleware.settings.router.prefix', '')}/${pluginName}`,
@@ -59,6 +60,12 @@ module.exports = strapi => {
             });
           });
 
+          // [PTK] router tracing
+          strapi.log.debug(">>>>>>>>>> PLUGIN ROUTER:", pluginName);
+          router.stack.forEach((item) => {
+            strapi.log.debug('  ', item.methods, '\t', item.path);
+          });
+        
           // Mount plugin router
           strapi.app.use(router.routes()).use(router.allowedMethods());
         });
