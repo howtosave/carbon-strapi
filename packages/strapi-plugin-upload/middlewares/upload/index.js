@@ -1,16 +1,15 @@
 'use strict';
 
-const { join } = require('path');
+const { join, isAbsolute } = require('path');
 const range = require('koa-range');
 const koaStatic = require('koa-static');
 
 module.exports = strapi => ({
   initialize() {
-    const staticDir = join(
-      strapi.dir,
-      // [PTK] fix overring upload directory issue
-      strapi.config.paths.static || strapi.config.middleware.settings.public.path
-    );
+    // [PTK] fix overring upload directory issue
+    const pathSetting = strapi.config.paths.static || strapi.config.middleware.settings.public.path;
+    // [PTK] supprot absolute path
+    const staticDir = isAbsolute(pathSetting) ? pathSetting : join(strapi.dir, pathSetting);
 
     strapi.app.on('error', err => {
       if (err.code === 'EPIPE') {
