@@ -3,12 +3,12 @@
 const { join } = require('path');
 const range = require('koa-range');
 const koaStatic = require('koa-static');
-//const Router = require('koa-router');
 
 module.exports = strapi => ({
   initialize() {
     const staticDir = join(
       strapi.dir,
+      // [PTK] fix overring upload directory issue
       strapi.config.paths.static || strapi.config.middleware.settings.public.path
     );
 

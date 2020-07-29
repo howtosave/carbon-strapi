@@ -75,9 +75,12 @@ module.exports = strapi => {
       if (!strapi.config.serveAdminPanel) return;
 
       const buildDir = path.resolve(strapi.dir, 'build');
+      // [PTK] fix prefix-url issue
+      // main router already has a prefix. so add a path w/o url prefix for static file service
+      const adminPathWoPrefix = strapi.config.admin.path.replace(strapi.config.get('middleware.settings.router.prefix', ''), '');
 
       strapi.router.get(
-        `${strapi.config.admin.path}/*`,
+        `${adminPathWoPrefix}/*`,
         async (ctx, next) => {
           ctx.url = path.basename(ctx.url);
           await next();
@@ -89,7 +92,7 @@ module.exports = strapi => {
         })
       );
 
-      strapi.router.get(`${strapi.config.admin.path}*`, ctx => {
+      strapi.router.get(`${adminPathWoPrefix}*`, ctx => {
         ctx.type = 'html';
         ctx.body = fs.createReadStream(path.join(buildDir + '/index.html'));
       });
