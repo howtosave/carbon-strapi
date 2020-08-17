@@ -20,6 +20,11 @@ const OnboardingVideos = () => {
   const { isLoading, isOpen, videos } = reducerState.toJS();
 
   useEffect(() => {
+    // [PTK] hide video
+    dispatch({
+      type: 'HIDE_VIDEO_ONBOARDING',
+    });
+
     const getData = async () => {
       try {
         const { data } = await axios.get('https://strapi.io/videos', {
@@ -40,7 +45,7 @@ const OnboardingVideos = () => {
       }
     };
 
-    getData();
+    //getData();
   }, []);
 
   // Hide the player in case of request error
