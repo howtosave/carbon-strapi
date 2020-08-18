@@ -3,12 +3,13 @@ const _ = require('lodash');
 module.exports = async (ctx, next) => {
   let role;
 
+  strapi.log.debug(">>>[PTK] permissions:", ctx.request.header.authorization);
   if (ctx.request && ctx.request.header && ctx.request.header.authorization) {
     try {
       const { id, isAdmin = false } = await strapi.plugins[
         'users-permissions'
       ].services.jwt.getToken(ctx);
-
+      strapi.log.debug(">>>[PTK] permissions:", id, isAdmin);
       if (id === undefined) {
         throw new Error('Invalid token: Token did not contain required fields');
       }
