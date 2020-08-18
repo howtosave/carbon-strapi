@@ -4,21 +4,13 @@ const assert = require('assert');
 const _ = require('lodash');
 const path = require('path');
 // [PTK] fse replacement
-const fs = require('fs');
-
-const _readdirSync = (path,opt) => {
-  try {
-    return fs.readdirSync(path,opt);
-  } catch {
-    return [];
-  }
-};
+const fse = require('fs');
 
 module.exports = dir => {
-  if (!fs.existsSync(dir)) return {};
+  if (!fse.existsSync(dir)) return {};
 
   const root = {};
-  const paths = _readdirSync(dir, { withFileTypes: true }).filter(fd => fd.isFile());
+  const paths = fse.readdirSync(dir, { withFileTypes: true }).filter(fd => fd.isFile());
 
   for (let fd of paths) {
     const { name } = fd;

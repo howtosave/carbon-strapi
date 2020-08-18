@@ -3,23 +3,13 @@
 const _ = require('lodash');
 const { join } = require('path');
 // [PTK] fse replacement
-const { access } = require('fs').promises;
+const { exists } = require('./fs_extra');
 const loadFiles = require('../load/load-files');
-
-// [PTK] fse replacement
-const _exists = async path => {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
-};
 
 module.exports = async strapi => {
   const componentsDir = join(strapi.dir, 'components');
 
-  if (!(await _exists(componentsDir))) {
+  if (!(await exists(componentsDir))) {
     return {};
   }
 

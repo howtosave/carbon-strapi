@@ -3,21 +3,13 @@
 const assert = require('assert');
 const path = require('path');
 // [PTK] fse replacement
-const fs = require('fs');
-
-const _readdirSync = (path,opt) => {
-  try {
-    return fs.readdirSync(path,opt);
-  } catch {
-    return [];
-  }
-};
+const fse = require('./fs_extra');
 
 module.exports = function walk(dir, { loader } = {}) {
   assert(typeof loader === 'function', 'opts.loader must be a function');
 
   const root = {};
-  const paths = _readdirSync(dir, { withFileTypes: true });
+  const paths = fse.readdirSync(dir, { withFileTypes: true });
 
   for (let fd of paths) {
     const { name } = fd;

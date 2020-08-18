@@ -2,20 +2,11 @@
 
 // Dependencies.
 // [PTK] fse replacement
-const fs = require('fs');
+const fs = require('./fs_extra');
 const path = require('path');
 const _ = require('lodash');
 const glob = require('../load/glob');
 const findPackagePath = require('../load/package-path');
-
-// [PTK] fse replacement
-const _readdir = async path => {
-  try {
-    return await fs.promises.readdir(path);
-  } catch {
-    return [];
-  }
-}
 
 /**
  * Load middlewares
@@ -74,11 +65,11 @@ const createLoaders = strapi => {
     const pluginsDir = path.resolve(appPath, 'plugins');
     if (!fs.existsSync(pluginsDir)) return;
 
-    const pluginsNames = await _readdir(pluginsDir);
+    const pluginsNames = await fs.readdir(pluginsDir);
 
     for (let pluginFolder of pluginsNames) {
       // ignore files
-      const stat = await fs.promises.stat(path.resolve(pluginsDir, pluginFolder));
+      const stat = await fs.stat(path.resolve(pluginsDir, pluginFolder));
       if (!stat.isDirectory()) continue;
 
       const dir = path.resolve(pluginsDir, pluginFolder, 'middlewares');
