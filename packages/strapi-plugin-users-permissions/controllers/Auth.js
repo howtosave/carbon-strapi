@@ -249,10 +249,10 @@ module.exports = {
       .get();
 
     const [requestPath] = ctx.request.url.split('?');
-    const provider = requestPath.split('/')[2];
+    const provider = requestPath.split('/')[2] === 'connect' ? requestPath.split('/')[3] : requestPath.split('/')[2];
 
     if (!_.get(grantConfig[provider], 'enabled')) {
-      return ctx.badRequest(null, 'This provider is disabled.');
+      return ctx.badRequest(null, 'This provider is disabled.' + provider);
     }
     // Ability to pass OAuth callback dynamically
     grantConfig[provider].callback = _.get(ctx, 'query.callback') || grantConfig[provider].callback;
