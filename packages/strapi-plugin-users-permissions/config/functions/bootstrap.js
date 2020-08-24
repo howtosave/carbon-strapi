@@ -98,7 +98,7 @@ module.exports = async () => {
       key: '',
       secret: '',
       callback: `${strapi.config.server.url}/auth/apple/callback`,
-      scope: ['identify', 'email'],
+      scope: ['name email'],
     },
   };
   const prevGrantConfig = (await pluginStore.get({ key: 'grant' })) || {};
