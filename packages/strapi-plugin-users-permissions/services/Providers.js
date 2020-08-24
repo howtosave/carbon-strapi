@@ -13,6 +13,10 @@ const purest = require('purest')({ request });
 const purestConfig = require('@purest/providers');
 
 // [PTK] parse id_token for apple sign in
+function base64urlUnescape(str) {
+  str += new Array(5 - str.length % 4).join('=');
+  return str.replace(/\-/g, '+').replace(/_/g, '/');
+}
 function unescapeAppleIdToken(idToken, cb) {
   // Jwt format: header . body . signature
   var segments = idToken.split('.');
@@ -410,7 +414,7 @@ const getProfile = async (provider, query, callback) => {
     // [PTK] add apple sign in
     // See https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens
     case 'apple': {
-      const {id_token} = query;
+      const { id_token } = query;
       unescapeAppleIdToken(id_token, callback);
       break;
     }
