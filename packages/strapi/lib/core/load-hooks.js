@@ -2,20 +2,11 @@
 
 // Dependencies.
 // [PTK] fse replacement
-const fs = require('fs');
+const fs = require('./fs_extra');
 const path = require('path');
 const _ = require('lodash');
 const glob = require('../load/glob');
 const findPackagePath = require('../load/package-path');
-
-// [PTK] fse replacement
-const _readdir = async path => {
-  try {
-    return await fs.promises.readdir(path);
-  } catch {
-    return [];
-  }
-}
 
 /**
  * Load hooks
@@ -64,11 +55,11 @@ const loadLocalPluginsHooks = async (appPath, hooks) => {
   const pluginsDir = path.resolve(appPath, 'plugins');
   if (!fs.existsSync(pluginsDir)) return;
 
-  const pluginsNames = await _readdir(pluginsDir);
+  const pluginsNames = await fs.readdir(pluginsDir);
 
   for (let pluginName of pluginsNames) {
     // ignore files
-    const stat = await fs.promises.stat(path.resolve(pluginsDir, pluginName));
+    const stat = await fs.stat(path.resolve(pluginsDir, pluginName));
     if (!stat.isDirectory()) continue;
 
     const dir = path.resolve(pluginsDir, pluginName, 'hooks');

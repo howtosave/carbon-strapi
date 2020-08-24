@@ -1,7 +1,7 @@
 'use strict';
 
 // [PTK] fse replacement
-const fs = require('fs');
+const fs = require('./fs_extra');
 
 const walk = require('./walk');
 

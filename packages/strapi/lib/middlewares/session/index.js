@@ -116,7 +116,7 @@ module.exports = strapi => {
           strapi.app.use((ctx, next) => {
             ctx.state = ctx.state || {};
             ctx.state.session = ctx.session || {};
-
+            strapi.log.debug(">>>[PTK] non-cookie session:", ctx.state);
             return next();
           });
         }
@@ -131,7 +131,7 @@ module.exports = strapi => {
         strapi.app.use((ctx, next) => {
           ctx.state = ctx.state || {};
           ctx.state.session = ctx.session || {};
-
+          strapi.log.debug(">>>[PTK] cookie session:", ctx.state);
           return next();
         });
       }
