@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function sanitizeEntity(data, { model, withPrivate = false }) {
+module.exports = function sanitizeEntity(data, { model, withPrivate = false, ignore = [] }) {
   if (typeof data !== 'object' || data == null) return data;
 
   let plainData = typeof data.toJSON === 'function' ? data.toJSON() : data;
@@ -11,6 +11,9 @@ module.exports = function sanitizeEntity(data, { model, withPrivate = false }) {
   return Object.keys(plainData).reduce((acc, key) => {
     const attribute = attributes[key];
     if (attribute && attribute.private === true && withPrivate !== true) {
+      return acc;
+    }
+    if (ignore && ignore.find(e => e === key)) {
       return acc;
     }
 
@@ -28,9 +31,9 @@ module.exports = function sanitizeEntity(data, { model, withPrivate = false }) {
       if (targetModel && plainData[key] !== null) {
         acc[key] = Array.isArray(plainData[key])
           ? plainData[key].map(entity =>
-              sanitizeEntity(entity, { model: targetModel, withPrivate })
+              sanitizeEntity(entity, { model: targetModel, withPrivate, ignore })
             )
-          : sanitizeEntity(plainData[key], { model: targetModel, withPrivate });
+          : sanitizeEntity(plainData[key], { model: targetModel, withPrivate, ignore });
 
         return acc;
       }
