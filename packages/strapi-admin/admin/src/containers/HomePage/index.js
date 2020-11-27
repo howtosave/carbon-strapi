@@ -53,8 +53,7 @@ const SOCIAL_LINKS = [
 ];
 
 const HomePage = ({ global: { plugins }, history: { push } }) => {
-  // [PTK] skip fetcing posts
-  const { error, isLoading, posts } = { error: null, isLoading:false, posts: [] }; //useFetch();
+  const { error, isLoading, posts } = useFetch();
   const handleClick = e => {
     e.preventDefault();
 
