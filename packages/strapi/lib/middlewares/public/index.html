@@ -25,7 +25,9 @@
           </div>
           <div class="text-align-right">
             <p><%= serverTime %></p>
-            <a class="cta cta-primary" href="<%= strapi.config.admin.url %>" title="Click to open the administration" ><i class="fas fa-external-link-alt"></i>Open the administration</a>
+            <% if (strapi.config.serveAdminPanel) { %>
+            <a class="cta cta-primary" href="<%= strapi.config.admin.url %>" target="_blank" title="Click to open the administration" ><i class="fas fa-external-link-alt"></i>Open the administration</a>
+            <% } %>
           </div>
         </div>
       <% } else if (strapi.config.environment === 'development' && !isInitialised) { %>
@@ -33,6 +35,7 @@
           <h2>Let's get started!</h2>
           <p>To discover the power provided by Strapi, you need to create an administrator.</p>
           <a class="cta cta-secondary" href="<%= strapi.config.admin.url %>" target="_blank" title="Click to create the first administration" ><i class="fas fa-external-link-alt"></i>Create the first administrator</a>
+<!--[PK] remove useless part-->
         </div>
       <% } else { %>
         <div class="informations">
