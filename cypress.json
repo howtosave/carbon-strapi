@@ -1,7 +1,7 @@
 {
   "chromeWebSecurity": false,
-  "backendUrl": "http://localhost:1337",
-  "baseUrl": "http://localhost:1337",
+  "backendUrl": "http://localhost:7337",
+  "baseUrl": "http://localhost:7337",
   "frontLoadingDelay": 5000,
   "animDelay": 1000,
   "serverRestartDelay": 11000,
