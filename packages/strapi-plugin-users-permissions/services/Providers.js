@@ -32,7 +32,7 @@ function unescapeAppleIdToken(idToken, cb) {
       username: body.email.split('@')[0],
       email: body.email,
     });
-  } 
+  }
   catch(e) {
     return cb(e);
   }
@@ -66,6 +66,7 @@ exports.connect = (provider, query) => {
       if (!profile.email) {
         return reject([null, { message: 'Email was not available.' }]);
       }
+      profile.email = profile.email.toLowerCase();
 
       try {
         const users = await strapi.query('user', 'users-permissions').find({
