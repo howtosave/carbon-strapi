@@ -1,7 +1,7 @@
 'use strict';
 const chalk = require('chalk');
 
-const codeToColor = code => {
+const codeToColor = (code) => {
   return code >= 500
     ? chalk.red(code)
     : code >= 400
@@ -17,7 +17,7 @@ const codeToColor = code => {
  * Logger hook
  */
 
-module.exports = strapi => {
+module.exports = (strapi) => {
   return {
     /**
      * Initialize the hook
@@ -39,6 +39,10 @@ module.exports = strapi => {
           await next();
           const delta = Math.ceil(Date.now() - start);
           strapi.log.debug(`${ctx.method} ${ctx.url} (${delta} ms) ${codeToColor(ctx.status)}`);
+          if (strapi.log.level === 'trace') {
+            if (ctx.request.length > 0) strapi.log.trace('req body:', ctx.body);
+            if (ctx.response.body) strapi.log.trace('res body:', ctx.response.body);
+          }
         });
       }
     },
