@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Checkbox } from '@buffetjs/core';
-import { get } from 'lodash';
+import { get, pick } from 'lodash';
 import { prefixFileUrlWithBackendUrl } from 'strapi-helper-plugin';
 import { getTrad, getType } from '../../utils';
 import Card from '../Card';
@@ -20,6 +20,7 @@ const List = ({
   smallCards,
   canSelect,
   renderCardControl,
+  showCheckbox,
 }) => {
   const selectedAssets = selectedItems.length;
 
@@ -39,25 +40,28 @@ const List = ({
       <ListRow>
         {data.map(item => {
           const { id } = item;
-          const url = get(item, ['formats', 'small', 'url'], item.url);
+          const thumbnail = get(item, ['formats', 'small'], item);
           const isAllowed =
             allowedTypes.length > 0 ? allowedTypes.includes(getType(item.mime)) : true;
           const checked = selectedItems.findIndex(file => file.id === id) !== -1;
-          const fileUrl = prefixFileUrlWithBackendUrl(url);
+
+          const fileUrl = prefixFileUrlWithBackendUrl(thumbnail.url);
+
+          const cardOptions = {
+            ...pick(item, ['ext', 'name', 'mime', 'height', 'width', 'size', 'previewUrl', 'id']),
+            isDisabled: !isAllowed,
+            checked,
+            url: fileUrl,
+            onClick: onCardClick,
+            small: smallCards,
+          };
 
           return (
             <ListCell key={id}>
-              <Card
-                isDisabled={!isAllowed}
-                checked={checked}
-                {...item}
-                url={fileUrl}
-                onClick={onCardClick}
-                small={smallCards}
-              >
+              <Card options={cardOptions}>
                 {(checked || canSelect) && (
                   <>
-                    {(checked || isAllowed) && (
+                    {(checked || isAllowed) && showCheckbox && (
                       <CardControlsWrapper leftAlign className="card-control-wrapper">
                         <Checkbox
                           name={`${id}`}
@@ -92,6 +96,7 @@ List.defaultProps = {
   renderCardControl: null,
   selectedItems: [],
   smallCards: false,
+  showCheckbox: true,
 };
 
 List.propTypes = {
@@ -103,6 +108,7 @@ List.propTypes = {
   renderCardControl: PropTypes.func,
   selectedItems: PropTypes.array,
   smallCards: PropTypes.bool,
+  showCheckbox: PropTypes.bool,
 };
 
 export default List;

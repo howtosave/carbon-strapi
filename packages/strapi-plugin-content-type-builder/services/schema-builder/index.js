@@ -93,8 +93,9 @@ function createSchemaBuilder({ components, contentTypes }) {
               via,
               allowedTypes: attribute.allowedTypes,
               plugin: 'upload',
-              required: attribute.required ? true : false,
+              required: !!attribute.required,
               configurable: configurable === false ? false : undefined,
+              pluginOptions: attribute.pluginOptions || {},
             };
           } else {
             acc[key] = {
@@ -114,8 +115,8 @@ function createSchemaBuilder({ components, contentTypes }) {
             targetAttribute,
             columnName,
             dominant,
-            autoPopulate,
             private: isPrivate,
+            ...restOfOptions
           } = attribute;
 
           const attr = {
@@ -123,7 +124,7 @@ function createSchemaBuilder({ components, contentTypes }) {
             columnName: columnName || undefined,
             configurable: configurable === false ? false : undefined,
             private: isPrivate === true ? true : undefined,
-            autoPopulate,
+            ...restOfOptions,
           };
 
           if (!this.contentTypes.has(target)) {

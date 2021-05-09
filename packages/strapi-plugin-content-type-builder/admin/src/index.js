@@ -13,15 +13,21 @@ import Link from './InjectedComponents/ContentManager/EditViewLink';
 import Button from './InjectedComponents/ContentManager/EditSettingViewButton';
 import lifecycles from './lifecycles';
 import trads from './translations';
+import pluginPermissions from './permissions';
 import pluginId from './pluginId';
+import reducers from './reducers';
+import formsAPI from './utils/formAPI';
 
 export default strapi => {
   const pluginDescription = pluginPkg.strapi.description || pluginPkg.description;
+  const icon = pluginPkg.strapi.icon;
+  const name = pluginPkg.strapi.name;
+
   const plugin = {
     blockerComponent: null,
     blockerComponentProps: {},
     description: pluginDescription,
-    icon: pluginPkg.strapi.icon,
+    icon,
     id: pluginId,
     initializer: Initializer,
     injectedComponents: [
@@ -47,13 +53,30 @@ export default strapi => {
     isRequired: pluginPkg.strapi.required || false,
     layout: null,
     lifecycles,
-    leftMenuLinks: [],
-    leftMenuSections: [],
     mainComponent: App,
-    name: pluginPkg.strapi.name,
+    name,
     pluginLogo,
     preventComponentRendering: false,
+    reducers,
     trads,
+    menu: {
+      pluginsSectionLinks: [
+        {
+          destination: `/plugins/${pluginId}`,
+          icon,
+          label: {
+            id: `${pluginId}.plugin.name`,
+            defaultMessage: 'Content-Types Builder',
+          },
+          name,
+          permissions: pluginPermissions.main,
+        },
+      ],
+    },
+    // Internal APIs exposed by the CTB for the other plugins to use
+    apis: {
+      forms: formsAPI,
+    },
   };
 
   return strapi.registerPlugin(plugin);

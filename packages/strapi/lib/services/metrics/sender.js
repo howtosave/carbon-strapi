@@ -1,11 +1,30 @@
 'use strict';
 
 const os = require('os');
-
+const _ = require('lodash');
 const isDocker = require('is-docker');
 const { machineIdSync } = require('node-machine-id');
 const fetch = require('node-fetch');
 const ciEnv = require('ci-info');
+const ee = require('../../utils/ee');
+const stringifyDeep = require('./stringify-deep');
+
+const defaultQueryOpts = {
+  timeout: 1000,
+  headers: { 'Content-Type': 'application/json' },
+};
+
+const ANALYTICS_URI = 'https://analytics.strapi.io';
+
+/**
+ * Add properties from the package.json strapi key in the metadata
+ * @param {object} metadata
+ */
+const addPackageJsonStrapiMetadata = (metadata, strapi) => {
+  const { packageJsonStrapi = {} } = strapi.config;
+
+  _.defaults(metadata, packageJsonStrapi);
+};
 
 /**
  * Create a send function for event with all the necessary metadatas
@@ -13,8 +32,9 @@ const ciEnv = require('ci-info');
  * @returns {Function} (event, payload) -> Promise{boolean}
  */
 module.exports = strapi => {
-  const uuid = strapi.config.uuid;
+  const { uuid } = strapi.config;
   const deviceId = machineIdSync();
+  const isEE = strapi.EE === true && ee.isEE === true;
 
   const anonymous_metadata = {
     environment: strapi.config.environment,
@@ -26,6 +46,7 @@ module.exports = strapi => {
     isCI: ciEnv.isCI,
     version: strapi.config.info.strapi,
     strapiVersion: strapi.config.info.strapi,
+    projectType: isEE ? 'Enterprise' : 'Community',
   };
 
   return async (event, payload = {}) => {
@@ -43,10 +64,12 @@ module.exports = strapi => {
             ...anonymous_metadata,
           },
         }),
-        timeout: 1000,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      }),
+      ..._.merge({}, defaultQueryOpts, opts),
+    };
 
+    try {
+      const res = await fetch(`${ANALYTICS_URI}/track`, reqParams);
       return res.ok;
     } catch (err) {
       return false;

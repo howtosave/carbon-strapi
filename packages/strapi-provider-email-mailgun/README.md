@@ -2,12 +2,12 @@
 
 ## Resources
 
-- [MIT License](LICENSE.md)
+- [License](LICENSE)
 
 ## Links
 
-- [Strapi website](http://strapi.io/)
-- [Strapi community on Slack](http://slack.strapi.io)
+- [Strapi website](https://strapi.io/)
+- [Strapi community on Slack](https://slack.strapi.io)
 - [Strapi news on Twitter](https://twitter.com/strapijs)
 
 ## Prerequisites
@@ -34,6 +34,7 @@ npm install strapi-provider-email-mailgun --save
 | settings.defaultFrom    | string                  | Default sender mail address                                                                                                        | no       | undefined |
 | settings.defaultReplyTo | string \| array<string> | Default address or addresses the receiver is asked to reply to                                                                     | no       | undefined |
 
+> :warning: The Shipper Email (or defaultfrom) may also need to be changed in the `Email Templates` tab on the admin panel for emails to send properly
 ### Example
 
 **Path -** `config/plugins.js`
@@ -45,6 +46,8 @@ module.exports = ({ env }) => ({
     provider: 'mailgun',
     providerOptions: {
       apiKey: env('MAILGUN_API_KEY'),
+      domain: env('MAILGUN_DOMAIN'), //Required if you have an account with multiple domains
+      host: env('MAILGUN_HOST', 'api.mailgun.net'), //Optional. If domain region is Europe use 'api.eu.mailgun.net'
     },
     settings: {
       defaultFrom: 'myemail@protonmail.com',

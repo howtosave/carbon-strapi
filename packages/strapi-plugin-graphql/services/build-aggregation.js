@@ -212,7 +212,7 @@ const createAggregationFieldsResolver = function(model, fields, operation, typeC
  * Correctly format the data returned by the group by
  */
 const preProcessGroupByData = function({ result, fieldKey, filters }) {
-  const _result = _.toArray(result);
+  const _result = _.toArray(result).filter(value => Boolean(value._id));
   return _.map(_result, value => {
     return {
       key: value._id.toString(),
@@ -494,8 +494,9 @@ const formatConnectionAggregator = function(fields, model, modelName) {
  *  }
  *
  */
-const formatModelConnectionsGQL = function({ fields, model, name, resolver }) {
-  const { globalId } = model;
+const formatModelConnectionsGQL = function({ fields, model: contentType, name, resolver }) {
+  const { globalId } = contentType;
+  const model = strapi.getModel(contentType.uid);
 
   const connectionGlobalId = `${globalId}Connection`;
 
@@ -514,8 +515,6 @@ const formatModelConnectionsGQL = function({ fields, model, name, resolver }) {
   }
   modelConnectionTypes += groupByFormat.type;
 
-  const queryName = `${pluralName}Connection(sort: String, limit: Int, start: Int, where: JSON)`;
-
   const connectionResolver = buildQueryResolver(`${pluralName}Connection.values`, resolver);
 
   const connectionQueryName = `${pluralName}Connection`;
@@ -524,7 +523,16 @@ const formatModelConnectionsGQL = function({ fields, model, name, resolver }) {
     globalId: connectionGlobalId,
     definition: modelConnectionTypes,
     query: {
-      [queryName]: connectionGlobalId,
+      [`${pluralName}Connection`]: {
+        args: {
+          sort: 'String',
+          limit: 'Int',
+          start: 'Int',
+          where: 'JSON',
+          ...(resolver.args || {}),
+        },
+        type: connectionGlobalId,
+      },
     },
     resolvers: {
       Query: {

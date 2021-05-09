@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { getTrad } from '../../utils';
+import { Flex } from '@buffetjs/core';
 
-import Flex from '../Flex';
+import { getTrad } from '../../utils';
 import IntlText from '../IntlText';
 import ListTitle from '../UploadList/ListTitle';
 import useModalContext from '../../hooks/useModalContext';
@@ -13,6 +13,7 @@ import ListWrapper from './ListWrapper';
 
 const SelectedAssets = () => {
   const {
+    allowedActions,
     selectedFiles,
     handleFileSelection,
     handleGoToEditFile,
@@ -39,6 +40,7 @@ const SelectedAssets = () => {
       </Flex>
       <ListWrapper>
         <SortableList
+          allowedActions={allowedActions}
           data={selectedFiles}
           moveAsset={moveAsset}
           noNavigation={noNavigation}

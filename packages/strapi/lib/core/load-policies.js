@@ -1,10 +1,10 @@
 'use strict';
 
 const assert = require('assert');
-const _ = require('lodash');
 const path = require('path');
 // [PTK] fse replacement
 const fse = require('fs');
+const _ = require('lodash');
 
 module.exports = dir => {
   if (!fse.existsSync(dir)) return {};

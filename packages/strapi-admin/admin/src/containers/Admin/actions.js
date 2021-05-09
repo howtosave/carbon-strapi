@@ -4,12 +4,13 @@
  *
  */
 
-import { GET_PLUGINS_FROM_MARKETPLACE_SUCCEEDED, SET_APP_ERROR } from './constants';
+import { GET_STRAPI_LATEST_RELEASE_SUCCEEDED, SET_APP_ERROR } from './constants';
 
-export function getPluginsFromMarketPlaceSucceeded(plugins) {
+export function getStrapiLatestReleaseSucceeded(latestStrapiReleaseTag, shouldUpdateStrapi) {
   return {
-    type: GET_PLUGINS_FROM_MARKETPLACE_SUCCEEDED,
-    plugins,
+    type: GET_STRAPI_LATEST_RELEASE_SUCCEEDED,
+    latestStrapiReleaseTag,
+    shouldUpdateStrapi,
   };
 }
 

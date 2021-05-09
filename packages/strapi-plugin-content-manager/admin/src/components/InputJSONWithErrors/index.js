@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty, isFunction } from 'lodash';
 import cn from 'classnames';
-
+import { LabelIconWrapper } from 'strapi-helper-plugin';
 import { Description, ErrorMessage, Label } from '@buffetjs/styles';
 import { Error } from '@buffetjs/core';
 
@@ -31,6 +31,7 @@ class InputJSONWithErrors extends React.Component {
       inputDescription,
       inputStyle,
       label,
+      labelIcon,
       name,
       onBlur,
       placeholder,
@@ -44,22 +45,20 @@ class InputJSONWithErrors extends React.Component {
     const handleBlur = isFunction(onBlur) ? onBlur : this.handleBlur;
 
     return (
-      <Error
-        inputError={inputError}
-        name={name}
-        type="text"
-        validations={validations}
-      >
+      <Error inputError={inputError} name={name} type="text" validations={validations}>
         {({ canCheck, onBlur, error, dispatch }) => {
-          const hasError = error && error !== null;
+          const hasError = Boolean(error);
 
           return (
             <Wrapper
-              className={`${cn(!isEmpty(className) && className)} ${
-                hasError ? 'bordered' : ''
-              }`}
+              className={`${cn(!isEmpty(className) && className)} ${hasError ? 'bordered' : ''}`}
             >
-              <Label htmlFor={name}>{label}</Label>
+              <Label htmlFor={name}>
+                <span>{label}</span>
+                {labelIcon && (
+                  <LabelIconWrapper title={labelIcon.title}>{labelIcon.icon}</LabelIconWrapper>
+                )}
+              </Label>
               <InputJSON
                 {...rest}
                 autoFocus={autoFocus}
@@ -87,9 +86,7 @@ class InputJSONWithErrors extends React.Component {
                 tabIndex={tabIndex}
                 value={value}
               />
-              {!hasError && inputDescription && (
-                <Description>{inputDescription}</Description>
-              )}
+              {!hasError && inputDescription && <Description>{inputDescription}</Description>}
               {hasError && <ErrorMessage>{error}</ErrorMessage>}
             </Wrapper>
           );
@@ -111,6 +108,7 @@ InputJSONWithErrors.defaultProps = {
   inputStyle: {},
   label: '',
   labelClassName: '',
+  labelIcon: null,
   labelStyle: {},
   onBlur: false,
   placeholder: '',
@@ -146,6 +144,10 @@ InputJSONWithErrors.propTypes = {
     }),
   ]),
   labelClassName: PropTypes.string,
+  labelIcon: PropTypes.shape({
+    icon: PropTypes.node.isRequired,
+    title: PropTypes.string.isRequired,
+  }),
   labelStyle: PropTypes.object,
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),

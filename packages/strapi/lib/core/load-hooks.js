@@ -18,6 +18,8 @@ module.exports = async function({ installedHooks, installedPlugins, appPath }) {
     loadHookDependencies(installedHooks, hooks),
     // local middleware
     loadLocalHooks(appPath, hooks),
+    // admin hooks
+    loadAdminHooks(hooks),
     // plugins middlewares
     loadPluginsHooks(installedPlugins, hooks),
     // local plugin middlewares
@@ -38,16 +40,23 @@ const loadHooksInDir = async (dir, hooks) => {
   });
 };
 
-const loadLocalHooks = (appPath, hooks) =>
-  loadHooksInDir(path.resolve(appPath, 'hooks'), hooks);
+const loadLocalHooks = (appPath, hooks) => loadHooksInDir(path.resolve(appPath, 'hooks'), hooks);
 
 const loadPluginsHooks = async (plugins, hooks) => {
   for (let pluginName of plugins) {
-    const dir = path.resolve(
-      findPackagePath(`strapi-plugin-${pluginName}`),
-      'hooks'
-    );
+    const dir = path.resolve(findPackagePath(`strapi-plugin-${pluginName}`), 'hooks');
     await loadHooksInDir(dir, hooks);
+  }
+};
+
+const loadAdminHooks = async hooks => {
+  const hooksDir = 'hooks';
+  const dir = path.resolve(findPackagePath('strapi-admin'), hooksDir);
+  await loadHooksInDir(dir, hooks);
+
+  // load ee admin hooks if they exist
+  if (process.env.STRAPI_DISABLE_EE !== 'true' && strapi.EE) {
+    await loadHooksInDir(`${dir}/../ee/${hooksDir}`, hooks);
   }
 };
 
@@ -86,11 +95,7 @@ const mountHooks = (name, files, hooks) => {
 
     let dependencies = [];
     try {
-      dependencies = _.get(
-        require(`strapi-hook-${name}/package.json`),
-        'strapi.dependencies',
-        []
-      );
+      dependencies = _.get(require(`strapi-hook-${name}/package.json`), 'strapi.dependencies', []);
     } catch (err) {
       // Silent
     }

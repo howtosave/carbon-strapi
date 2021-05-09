@@ -8,10 +8,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty, isFunction } from 'lodash';
 import cn from 'classnames';
-
 import { Description, ErrorMessage, Label } from '@buffetjs/styles';
 import { Error } from '@buffetjs/core';
-
+import { LabelIconWrapper } from 'strapi-helper-plugin';
 import Wysiwyg from '../Wysiwyg';
 import Wrapper from './Wrapper';
 
@@ -28,6 +27,7 @@ class WysiwygWithErrors extends React.Component {
       inputDescription,
       inputStyle,
       label,
+      labelIcon,
       name,
       onBlur: handleBlur,
       onChange,
@@ -41,23 +41,21 @@ class WysiwygWithErrors extends React.Component {
     } = this.props;
 
     return (
-      <Error
-        inputError={inputError}
-        name={name}
-        type="text"
-        validations={validations}
-      >
+      <Error inputError={inputError} name={name} type="text" validations={validations}>
         {({ canCheck, onBlur, error, dispatch }) => {
-          const hasError = error && error !== null;
+          const hasError = Boolean(error);
 
           return (
             <Wrapper
-              className={`${cn(!isEmpty(className) && className)} ${
-                hasError ? 'bordered' : ''
-              }`}
+              className={`${cn(!isEmpty(className) && className)} ${hasError ? 'bordered' : ''}`}
               style={style}
             >
-              <Label htmlFor={name}>{label}</Label>
+              <Label htmlFor={name}>
+                <span>{label}</span>
+                {labelIcon && (
+                  <LabelIconWrapper title={labelIcon.title}>{labelIcon.icon}</LabelIconWrapper>
+                )}
+              </Label>
               <Wysiwyg
                 {...rest}
                 autoFocus={autoFocus}
@@ -86,9 +84,7 @@ class WysiwygWithErrors extends React.Component {
                 tabIndex={tabIndex}
                 value={value}
               />
-              {!hasError && inputDescription && (
-                <Description>{inputDescription}</Description>
-              )}
+              {!hasError && inputDescription && <Description>{inputDescription}</Description>}
               {hasError && <ErrorMessage>{error}</ErrorMessage>}
             </Wrapper>
           );
@@ -109,6 +105,7 @@ WysiwygWithErrors.defaultProps = {
   inputDescription: '',
   inputStyle: {},
   label: '',
+  labelIcon: null,
   onBlur: false,
   placeholder: '',
   resetProps: false,
@@ -143,6 +140,10 @@ WysiwygWithErrors.propTypes = {
       params: PropTypes.object,
     }),
   ]),
+  labelIcon: PropTypes.shape({
+    icon: PropTypes.node.isRequired,
+    title: PropTypes.string,
+  }),
   name: PropTypes.string.isRequired,
   onBlur: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
   onChange: PropTypes.func.isRequired,

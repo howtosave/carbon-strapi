@@ -2,6 +2,7 @@ import React, { memo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
+import { has } from 'lodash';
 
 import pluginId from '../../pluginId';
 import ItemTypes from '../../utils/ItemTypes';
@@ -11,14 +12,18 @@ import Relation from './Relation';
 
 function ListItem({
   data,
+  displayNavigationLink,
   findRelation,
+  isDisabled,
   mainField,
   moveRelation,
-  nextSearch,
   onRemove,
+  searchToPersist,
   targetModel,
 }) {
-  const to = `/plugins/${pluginId}/collectionType/${targetModel}/${data.id}?redirectUrl=${nextSearch}`;
+  const to = `/plugins/${pluginId}/collectionType/${targetModel}/${data.id}`;
+
+  const hasDraftAndPublish = has(data, 'published_at');
 
   const originalIndex = findRelation(data.id).index;
   const [{ isDragging }, drag, preview] = useDrag({
@@ -27,6 +32,7 @@ function ListItem({
       id: data.id,
       originalIndex,
       data,
+      hasDraftAndPublish,
       mainField,
     },
     collect: monitor => ({
@@ -51,8 +57,24 @@ function ListItem({
   const opacity = isDragging ? 0.2 : 1;
 
   return (
-    <Li ref={node => drag(drop(node))} style={{ opacity }}>
-      <Relation mainField={mainField} onRemove={onRemove} data={data} to={to} />
+    <Li
+      ref={node => {
+        if (!isDisabled) {
+          drag(drop(node));
+        }
+      }}
+      style={{ opacity }}
+    >
+      <Relation
+        displayNavigationLink={displayNavigationLink}
+        hasDraftAndPublish={hasDraftAndPublish}
+        mainField={mainField}
+        onRemove={onRemove}
+        data={data}
+        to={to}
+        isDisabled={isDisabled}
+        searchToPersist={searchToPersist}
+      />
     </Li>
   );
 }
@@ -60,18 +82,25 @@ function ListItem({
 ListItem.defaultProps = {
   findRelation: () => {},
   moveRelation: () => {},
-  nextSearch: '',
   onRemove: () => {},
+  searchToPersist: null,
   targetModel: '',
 };
 
 ListItem.propTypes = {
   data: PropTypes.object.isRequired,
+  displayNavigationLink: PropTypes.bool.isRequired,
   findRelation: PropTypes.func,
-  mainField: PropTypes.string.isRequired,
+  isDisabled: PropTypes.bool.isRequired,
+  mainField: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    schema: PropTypes.shape({
+      type: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
   moveRelation: PropTypes.func,
-  nextSearch: PropTypes.string,
   onRemove: PropTypes.func,
+  searchToPersist: PropTypes.string,
   targetModel: PropTypes.string,
 };
 

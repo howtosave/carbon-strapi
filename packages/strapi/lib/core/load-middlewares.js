@@ -18,16 +18,17 @@ module.exports = async function(strapi) {
 
   const loaders = createLoaders(strapi);
 
-  // load installed middlewares
   await loaders.loadMiddlewareDependencies(installedMiddlewares, middlewares);
   // internal middlewares
-  await loaders.loadInternalMiddlexares(middlewares);
+  await loaders.loadInternalMiddlewares(middlewares);
   // local middleware
   await loaders.loadLocalMiddlewares(appPath, middlewares);
   // plugins middlewares
   await loaders.loadPluginsMiddlewares(installedPlugins, middlewares);
   // local plugin middlewares
   await loaders.loadLocalPluginsMiddlewares(appPath, middlewares);
+  // load admin middlwares
+  await loaders.loadAdminMiddlewares(middlewares);
 
   return middlewares;
 };
@@ -48,7 +49,7 @@ const createLoaders = strapi => {
     });
   };
 
-  const loadInternalMiddlexares = middlewares =>
+  const loadInternalMiddlewares = middlewares =>
     loadMiddlewaresInDir(path.resolve(__dirname, '..', 'middlewares'), middlewares);
 
   const loadLocalMiddlewares = (appPath, middlewares) =>
@@ -74,6 +75,17 @@ const createLoaders = strapi => {
 
       const dir = path.resolve(pluginsDir, pluginFolder, 'middlewares');
       await loadMiddlewaresInDir(dir, middlewares);
+    }
+  };
+
+  const loadAdminMiddlewares = async middlewares => {
+    const middlewaresDir = 'middlewares';
+    const dir = path.resolve(findPackagePath(`strapi-admin`), middlewaresDir);
+    await loadMiddlewaresInDir(dir, middlewares);
+
+    // load ee admin middlewares if they exist
+    if (process.env.STRAPI_DISABLE_EE !== 'true' && strapi.EE) {
+      await loadMiddlewaresInDir(`${dir}/../ee/${middlewaresDir}`, middlewares);
     }
   };
 
@@ -109,10 +121,11 @@ const createLoaders = strapi => {
   };
 
   return {
-    loadInternalMiddlexares,
+    loadInternalMiddlewares,
     loadLocalMiddlewares,
     loadPluginsMiddlewares,
     loadLocalPluginsMiddlewares,
     loadMiddlewareDependencies,
+    loadAdminMiddlewares,
   };
 };

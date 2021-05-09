@@ -9,8 +9,11 @@ const _ = require('lodash');
 
 const stopProcess = require('./utils/stop-process');
 const { trackUsage, captureStderr } = require('./utils/usage');
+const mergeTemplate = require('./utils/merge-template.js');
+
 const packageJSON = require('./resources/json/package.json');
-const databaseJSON = require('./resources/json/database.json.js');
+const createDatabaseConfig = require('./resources/templates/database.js');
+const createServerConfig = require('./resources/templates/server.js');
 
 module.exports = async function createProject(scope, { client, connection, dependencies }) {
   console.log('Creating files.');
@@ -41,6 +44,7 @@ module.exports = async function createProject(scope, { client, connection, depen
         strapiVersion: scope.strapiVersion,
         projectName: _.kebabCase(scope.name),
         uuid: scope.uuid,
+        packageJsonStrapi: scope.packageJsonStrapi,
       }),
       {
         spaces: 2,
@@ -52,15 +56,28 @@ module.exports = async function createProject(scope, { client, connection, depen
     // ensure node_modules is created
     await fse.ensureDir(join(rootPath, 'node_modules'));
 
+    // create config/database.js
     await fse.writeFile(
       join(rootPath, `config/database.js`),
-      databaseJSON({
+      createDatabaseConfig({
         client,
         connection,
       })
     );
 
+    // create config/server.js
+    await fse.writeFile(join(rootPath, `config/server.js`), createServerConfig());
     await trackUsage({ event: 'didCopyConfigurationFiles', scope });
+
+    // merge template files if a template is specified
+    const hasTemplate = Boolean(scope.template);
+    if (hasTemplate) {
+      try {
+        await mergeTemplate(scope, rootPath);
+      } catch (error) {
+        throw new Error(`⛔️ Template installation failed: ${error.message}`);
+      }
+    }
   } catch (err) {
     await fse.remove(scope.rootPath);
     throw err;
@@ -114,7 +131,7 @@ module.exports = async function createProject(scope, { client, connection, depen
     );
     console.log(`Don't give up, your project was created correctly.`);
     console.log(
-      `Fix the issues mentionned in the installation errors and try to run the following command:`
+      `Fix the issues mentioned in the installation errors and try to run the following command:`
     );
     console.log();
     console.log(

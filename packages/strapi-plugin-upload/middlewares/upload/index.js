@@ -1,15 +1,16 @@
 'use strict';
 
-const { join, isAbsolute } = require('path');
+const { resolve } = require('path');
 const range = require('koa-range');
 const koaStatic = require('koa-static');
+const _ = require('lodash');
 
 module.exports = strapi => ({
   initialize() {
     // [PTK] fix overring upload directory issue
-    const pathSetting = strapi.config.paths.static || strapi.config.middleware.settings.public.path;
-    // [PTK] supprot absolute path
-    const staticDir = isAbsolute(pathSetting) ? pathSetting : join(strapi.dir, pathSetting);
+    const configPublicPath = strapi.config.paths.static || strapi.config.middleware.settings.public.path;
+
+    const staticDir = resolve(strapi.dir, configPublicPath);
 
     strapi.app.on('error', err => {
       if (err.code === 'EPIPE') {
@@ -22,6 +23,12 @@ module.exports = strapi => ({
       strapi.app.onerror(err);
     });
 
-    strapi.router.get('/uploads/(.*)', range, koaStatic(staticDir, { defer: true }));
+    const localServerConfig =
+      _.get(strapi, 'plugins.upload.config.providerOptions.localServer') || {};
+    strapi.router.get(
+      '/uploads/(.*)',
+      range,
+      koaStatic(staticDir, { defer: true, ...localServerConfig })
+    );
   },
 });

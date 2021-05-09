@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require('fs')
-const { existsSync, readdirSync:fsReaddirSync } = fs;
+const { existsSync, readdirSync:fsReaddirSync, readJsonSync:fsReadJsonSync } = fs;
 const { access, readdir:fsReaddir, stat } = fs.promises;
 
 /**
@@ -40,6 +40,14 @@ module.exports = {
       return fsReaddirSync(path, opt);
     } catch {
       return [];
+    }
+  },
+
+  readJsonSync(path) {
+    try {
+      return fsReadJsonSync(path);
+    } catch {
+      return null;
     }
   },
 

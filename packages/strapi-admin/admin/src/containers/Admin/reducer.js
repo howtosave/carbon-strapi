@@ -4,23 +4,36 @@
  *
  */
 
-import { fromJS } from 'immutable';
-import { GET_PLUGINS_FROM_MARKETPLACE_SUCCEEDED, SET_APP_ERROR } from './constants';
+import produce from 'immer';
+import packageJSON from '../../../../package.json';
 
-const initialState = fromJS({
+import { GET_STRAPI_LATEST_RELEASE_SUCCEEDED, SET_APP_ERROR } from './constants';
+
+const packageVersion = packageJSON.version;
+const initialState = {
   appError: false,
-  pluginsFromMarketplace: [],
-});
+  latestStrapiReleaseTag: `v${packageVersion}`,
+  shouldUpdateStrapi: false,
+};
 
-function adminReducer(state = initialState, action) {
-  switch (action.type) {
-    case GET_PLUGINS_FROM_MARKETPLACE_SUCCEEDED:
-      return state.update('pluginsFromMarketplace', () => fromJS(action.plugins));
-    case SET_APP_ERROR:
-      return state.update('appError', () => true);
-    default:
-      return state;
-  }
-}
+const reducer = (state = initialState, action) =>
+  // eslint-disable-next-line consistent-return
+  produce(state, draftState => {
+    switch (action.type) {
+      case GET_STRAPI_LATEST_RELEASE_SUCCEEDED: {
+        draftState.latestStrapiReleaseTag = action.latestStrapiReleaseTag;
+        draftState.shouldUpdateStrapi = action.shouldUpdateStrapi;
+        break;
+      }
 
-export default adminReducer;
+      case SET_APP_ERROR: {
+        draftState.appError = true;
+        break;
+      }
+      default:
+        return state;
+    }
+  });
+
+export default reducer;
+export { initialState };

@@ -18,7 +18,7 @@ const {
 } = require('./utils');
 
 const buildMutation = (mutationName, config) => {
-  const { resolver, resolverOf, transformOutput = _.identity } = config;
+  const { resolver, resolverOf, transformOutput = _.identity, isShadowCrud = false } = config;
 
   if (_.isFunction(resolver) && !isResolvablePath(resolverOf)) {
     throw new Error(
@@ -31,7 +31,7 @@ const buildMutation = (mutationName, config) => {
   // custom resolvers
   if (_.isFunction(resolver)) {
     return async (root, options = {}, graphqlContext, info) => {
-      const ctx = buildMutationContext({ options, graphqlContext });
+      const ctx = buildMutationContext({ options, graphqlContext, isShadowCrud });
 
       await policiesMiddleware(ctx);
       graphqlContext.context = ctx;
@@ -43,12 +43,12 @@ const buildMutation = (mutationName, config) => {
   const action = getAction(resolver);
 
   return async (root, options = {}, graphqlContext) => {
-    const ctx = buildMutationContext({ options, graphqlContext });
+    const ctx = buildMutationContext({ options, graphqlContext, isShadowCrud });
 
     await policiesMiddleware(ctx);
 
     const values = await action(ctx);
-    const result = ctx.body || values;
+    const result = ctx.body !== undefined ? ctx.body : values;
 
     if (_.isError(result)) {
       throw result;
@@ -58,10 +58,10 @@ const buildMutation = (mutationName, config) => {
   };
 };
 
-const buildMutationContext = ({ options, graphqlContext }) => {
+const buildMutationContext = ({ options, graphqlContext, isShadowCrud }) => {
   const { context } = graphqlContext;
 
-  const ctx = context.app.createContext(_.clone(context.req), _.clone(context.res));
+  const ctx = cloneKoaContext(context);
 
   if (options.input && options.input.where) {
     ctx.params = convertToParams(options.input.where || {});
@@ -73,6 +73,10 @@ const buildMutationContext = ({ options, graphqlContext }) => {
     ctx.request.body = options.input.data || {};
   } else {
     ctx.request.body = options;
+  }
+
+  if (isShadowCrud) {
+    ctx.query = convertToParams(_.omit(options, 'input'));
   }
 
   return ctx;
@@ -110,7 +114,7 @@ const buildQuery = (queryName, config) => {
     await policiesMiddleware(ctx);
 
     const values = await action(ctx);
-    const result = ctx.body || values;
+    const result = ctx.body !== undefined ? ctx.body : values;
 
     if (_.isError(result)) {
       throw result;
@@ -134,14 +138,20 @@ const validateResolverOption = config => {
   return true;
 };
 
+const cloneKoaContext = ctx => {
+  return Object.assign(ctx.app.createContext(_.clone(ctx.req), _.clone(ctx.res)), {
+    state: {
+      ...ctx.state,
+    },
+  });
+};
+
 const buildQueryContext = ({ options, graphqlContext }) => {
   const { context } = graphqlContext;
   const _options = _.cloneDeep(options);
 
-  const ctx = context.app.createContext(_.clone(context.req), _.clone(context.res));
+  const ctx = cloneKoaContext(context);
 
-  // Note: we've to used the Object.defineProperties to reset the prototype. It seems that the cloning the context
-  // cause a lost of the Object prototype.
   const opts = amountLimiting(_options);
 
   ctx.query = {
@@ -157,7 +167,6 @@ const buildQueryContext = ({ options, graphqlContext }) => {
 /**
  * Checks if a resolverPath (resolver or resovlerOf) might be resolved
  */
-
 const getPolicies = config => {
   const { resolver, policies = [], resolverOf } = config;
 

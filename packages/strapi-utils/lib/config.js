@@ -1,5 +1,7 @@
+'use strict';
+
 const _ = require('lodash');
-const { getCommonBeginning } = require('./stringFormatting');
+const { getCommonBeginning } = require('./string-formatting');
 
 const getConfigUrls = (serverConfig, forAdminBuild = false) => {
   // Defines serverUrl value

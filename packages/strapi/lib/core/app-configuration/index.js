@@ -12,13 +12,17 @@ dotenv.config({
 const os = require('os');
 const path = require('path');
 const _ = require('lodash');
+const dotenv = require('dotenv');
 
-const createConfigProvider = require('./config-provider');
-const loadConfigDir = require('./config-loader');
+dotenv.config({ path: process.env.ENV_PATH });
+
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 const getPrefixedDeps = require('../../utils/get-prefixed-dependencies');
 const loadPolicies = require('../load-policies');
 const loadFunctions = require('../load-functions');
+const loadConfigDir = require('./config-loader');
+const createConfigProvider = require('./config-provider');
 
 const { version: strapiVersion } = require(path.join(__dirname, '../../../package.json'));
 
@@ -41,6 +45,7 @@ const defaultConfig = {
   server: {
     host: process.env.HOST || os.hostname() || 'localhost',
     port: process.env.PORT || 1337,
+    proxy: false,
     cron: { enabled: false },
     admin: { autoOpen: false },
   },
@@ -79,6 +84,7 @@ module.exports = (dir, initialConfig = {}) => {
     autoReload,
     environment: process.env.NODE_ENV,
     uuid: _.get(pkgJSON, 'strapi.uuid'),
+    packageJsonStrapi: _.omit(_.get(pkgJSON, 'strapi', {}), 'uuid'),
     info: {
       ...pkgJSON,
       strapi: strapiVersion,
@@ -86,6 +92,7 @@ module.exports = (dir, initialConfig = {}) => {
     installedPlugins: getPrefixedDeps('strapi-plugin', pkgJSON),
     installedMiddlewares: getPrefixedDeps('strapi-middleware', pkgJSON),
     installedHooks: getPrefixedDeps('strapi-hook', pkgJSON),
+    installedProviders: getPrefixedDeps('strapi-provider', pkgJSON),
   };
 
   const baseConfig = {

@@ -1,3 +1,5 @@
+'use strict';
+
 const wrapWithRateLimiter = require('../rate-limiter');
 
 describe('Telemetry daily RateLimiter', () => {
@@ -19,7 +21,7 @@ describe('Telemetry daily RateLimiter', () => {
 
     await send('notRestricted');
 
-    expect(sender).toHaveBeenCalledWith('notRestricted', undefined);
+    expect(sender).toHaveBeenCalledWith('notRestricted');
   });
 
   test('Calls the sender as many times as request when events is not restricted', async () => {

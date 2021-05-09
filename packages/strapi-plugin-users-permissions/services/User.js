@@ -6,8 +6,10 @@
  * @description: A set of functions similar to controller's actions to avoid code duplication.
  */
 
+const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const _ = require('lodash');
+
+const { sanitizeEntity, getAbsoluteServerUrl } = require('strapi-utils');
 
 module.exports = {
   /**
@@ -62,8 +64,16 @@ module.exports = {
    * Promise to fetch a/an user.
    * @return {Promise}
    */
-  fetch(params, populate = ['role']) {
+  fetch(params, populate) {
     return strapi.query('user', 'users-permissions').findOne(params, populate);
+  },
+
+  /**
+   * Promise to fetch authenticated user.
+   * @return {Promise}
+   */
+  fetchAuthenticatedUser(id) {
+    return strapi.query('user', 'users-permissions').findOne({ id }, ['role']);
   },
 
   /**
@@ -75,11 +85,14 @@ module.exports = {
   },
 
   hashPassword(user = {}) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       if (!user.password || this.isHashed(user.password)) {
         resolve(null);
       } else {
         bcrypt.hash(`${user.password}`, 10, (err, hash) => {
+          if (err) {
+            return reject(err);
+          }
           resolve(hash);
         });
       }
@@ -102,15 +115,53 @@ module.exports = {
     return strapi.query('user', 'users-permissions').delete(params);
   },
 
-  async removeAll(params, query) {
-    const toRemove = Object.values(_.omit(query, 'source'));
-    const { primaryKey } = strapi.query('user', 'users-permissions');
-    const filter = { [`${primaryKey}_in`]: toRemove, _limit: 100 };
-
-    return strapi.query('user', 'users-permissions').delete(filter);
+  async removeAll(params) {
+    return strapi.query('user', 'users-permissions').delete(params);
   },
 
   validatePassword(password, hash) {
-    return bcrypt.compareSync(password, hash);
+    return bcrypt.compare(password, hash);
+  },
+
+  async sendConfirmationEmail(user) {
+    const userPermissionService = strapi.plugins['users-permissions'].services.userspermissions;
+    const pluginStore = await strapi.store({
+      environment: '',
+      type: 'plugin',
+      name: 'users-permissions',
+    });
+
+    const settings = await pluginStore
+      .get({ key: 'email' })
+      .then(storeEmail => storeEmail['email_confirmation'].options);
+
+    const userInfo = sanitizeEntity(user, {
+      model: strapi.query('user', 'users-permissions').model,
+    });
+
+    const confirmationToken = crypto.randomBytes(20).toString('hex');
+
+    await this.edit({ id: user.id }, { confirmationToken });
+
+    settings.message = await userPermissionService.template(settings.message, {
+      URL: `${getAbsoluteServerUrl(strapi.config)}/auth/email-confirmation`,
+      USER: userInfo,
+      CODE: confirmationToken,
+    });
+
+    settings.object = await userPermissionService.template(settings.object, { USER: userInfo });
+
+    // Send an email to the user.
+    await strapi.plugins['email'].services.email.send({
+      to: user.email,
+      from:
+        settings.from.email && settings.from.name
+          ? `${settings.from.name} <${settings.from.email}>`
+          : undefined,
+      replyTo: settings.response_email,
+      subject: settings.object,
+      text: settings.message,
+      html: settings.message,
+    });
   },
 };

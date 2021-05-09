@@ -17,6 +17,7 @@ import hasSubArray from './utils/hasSubArray';
 import hasSomeSubArray from './utils/HasSomeSubArray';
 
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 
 const MultipleMenuList = ({
   selectProps: { name, addComponentsToDynamicZone, inputValue, value },
@@ -92,8 +93,8 @@ const MultipleMenuList = ({
       });
     } else {
       // Close all collapses
-      categoriesToOpen.forEach(catName => {
-        setCollapses(prevState => ({ ...prevState, [catName]: false }));
+      categoriesToOpen.forEach((catName, index) => {
+        setCollapses(prevState => ({ ...prevState, [catName]: index === 0 }));
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

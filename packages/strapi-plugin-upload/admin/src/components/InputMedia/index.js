@@ -2,15 +2,18 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { get, isEmpty } from 'lodash';
-import { prefixFileUrlWithBackendUrl } from 'strapi-helper-plugin';
-
+import {
+  CheckPermissions,
+  LabelIconWrapper,
+  prefixFileUrlWithBackendUrl,
+} from 'strapi-helper-plugin';
+import pluginPermissions from '../../permissions';
 import { getTrad, formatFileForEditing } from '../../utils';
 import CardControl from '../CardControl';
 import CardControlWrapper from './CardControlWrapper';
 import CardPreviewWrapper from './CardPreviewWrapper';
 import EmptyInputMedia from './EmptyInputMedia';
 import EmptyText from './EmptyText';
-import IconUpload from './IconUpload';
 import InputFilePreview from './InputFilePreview';
 import InputModalStepper from '../../containers/InputModalStepper';
 import Name from './Name';
@@ -18,7 +21,18 @@ import Wrapper from './Wrapper';
 import Input from '../Input';
 import ErrorMessage from './ErrorMessage';
 
-const InputMedia = ({ label, onChange, name, attribute, value, type, id, error }) => {
+const InputMedia = ({
+  disabled,
+  label,
+  onChange,
+  name,
+  attribute,
+  value,
+  type,
+  id,
+  error,
+  labelIcon,
+}) => {
   const [modal, setModal] = useState({
     isOpen: false,
     step: 'list',
@@ -40,7 +54,14 @@ const InputMedia = ({ label, onChange, name, attribute, value, type, id, error }
   }, [modal.isOpen]);
 
   const handleClickToggleModal = () => {
-    setModal(prev => ({ isDisplayed: true, step: 'list', isOpen: !prev.isOpen, fileToEdit: null }));
+    if (!disabled) {
+      setModal(prev => ({
+        isDisplayed: true,
+        step: 'list',
+        isOpen: !prev.isOpen,
+        fileToEdit: null,
+      }));
+    }
   };
 
   const handleClosed = () => setModal(prev => ({ ...prev, isDisplayed: false }));
@@ -87,7 +108,10 @@ const InputMedia = ({ label, onChange, name, attribute, value, type, id, error }
   };
 
   const handleCopy = () => {
-    strapi.notification.info(getTrad('notification.link-copied'));
+    strapi.notification.toggle({
+      type: 'info',
+      message: { id: 'notification.link-copied' },
+    });
   };
 
   const handleAllowDrop = e => e.preventDefault();
@@ -108,29 +132,38 @@ const InputMedia = ({ label, onChange, name, attribute, value, type, id, error }
 
   return (
     <Wrapper hasError={!isEmpty(error)}>
-      <Name htmlFor={name}>{`${label}${displaySlidePagination}`}</Name>
+      <Name htmlFor={name}>
+        <span>{`${label}${displaySlidePagination}`}</span>
+        {labelIcon && <LabelIconWrapper title={labelIcon.title}>{labelIcon.icon}</LabelIconWrapper>}
+      </Name>
 
       <CardPreviewWrapper onDragOver={handleAllowDrop} onDrop={handleDrop}>
         <CardControlWrapper>
-          <CardControl
-            small
-            title="add"
-            color="#9EA7B8"
-            type="plus"
-            onClick={handleClickToggleModal}
-          />
-          {!hasNoValue && (
+          {!disabled && (
+            <CardControl
+              small
+              title="add"
+              color="#9EA7B8"
+              type="plus"
+              onClick={handleClickToggleModal}
+            />
+          )}
+          {!hasNoValue && !disabled && (
             <>
-              <CardControl
-                small
-                title="edit"
-                color="#9EA7B8"
-                type="pencil"
-                onClick={handleEditFile}
-              />
-              <CopyToClipboard onCopy={handleCopy} text={prefixedFileURL}>
-                <CardControl small title="copy-link" color="#9EA7B8" type="link" />
-              </CopyToClipboard>
+              <CheckPermissions permissions={pluginPermissions.update}>
+                <CardControl
+                  small
+                  title="edit"
+                  color="#9EA7B8"
+                  type="pencil"
+                  onClick={handleEditFile}
+                />
+              </CheckPermissions>
+              <CheckPermissions permissions={pluginPermissions.copyLink}>
+                <CopyToClipboard onCopy={handleCopy} text={prefixedFileURL}>
+                  <CardControl small title="copy-link" color="#9EA7B8" type="link" />
+                </CopyToClipboard>
+              </CheckPermissions>
               <CardControl
                 small
                 title="delete"
@@ -142,8 +175,7 @@ const InputMedia = ({ label, onChange, name, attribute, value, type, id, error }
           )}
         </CardControlWrapper>
         {hasNoValue ? (
-          <EmptyInputMedia onClick={handleClickToggleModal}>
-            <IconUpload />
+          <EmptyInputMedia onClick={handleClickToggleModal} disabled={disabled}>
             <EmptyText id={getTrad('input.placeholder')} />
           </EmptyInputMedia>
         ) : (
@@ -181,18 +213,25 @@ InputMedia.propTypes = {
     required: PropTypes.bool,
     type: PropTypes.string,
   }).isRequired,
+  disabled: PropTypes.bool,
   error: PropTypes.string,
   id: PropTypes.string,
   label: PropTypes.string,
+  labelIcon: PropTypes.shape({
+    icon: PropTypes.node.isRequired,
+    title: PropTypes.string,
+  }),
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   type: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
 };
 InputMedia.defaultProps = {
+  disabled: false,
   id: null,
   error: null,
   label: '',
+  labelIcon: null,
   value: null,
 };
 

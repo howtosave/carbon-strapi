@@ -1,11 +1,11 @@
 import React, { useEffect, useReducer, useRef } from 'react';
 import { Header, Inputs } from '@buffetjs/custom';
+import { Helmet } from 'react-helmet';
+import { Text } from '@buffetjs/core';
 import { isEqual } from 'lodash';
 import { LoadingIndicatorPage, useGlobalContext, request } from 'strapi-helper-plugin';
 
 import { getRequestUrl, getTrad } from '../../utils';
-import Text from '../../components/Text';
-// import Divider from './Divider';
 import SectionTitleWrapper from './SectionTitleWrapper';
 import Wrapper from './Wrapper';
 import init from './init';
@@ -58,7 +58,10 @@ const SettingsPage = () => {
         });
       }
 
-      strapi.notification.success('notification.form.success.fields');
+      strapi.notification.toggle({
+        type: 'success',
+        message: { id: 'notification.form.success.fields' },
+      });
     } catch (err) {
       console.error(err);
     }
@@ -109,6 +112,8 @@ const SettingsPage = () => {
 
   return (
     <>
+      <Helmet title={formatMessage({ id: getTrad('page.title') })} />
+
       <Header {...headerProps} />
       <Wrapper>
         <div className="container-fluid">
@@ -141,6 +146,22 @@ const SettingsPage = () => {
                 onChange={handleChange}
                 type="bool"
                 value={modifiedData.sizeOptimization}
+              />
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-6">
+              <Inputs
+                label={formatMessage({
+                  id: getTrad('settings.form.autoOrientation.label'),
+                })}
+                description={formatMessage({
+                  id: getTrad('settings.form.autoOrientation.description'),
+                })}
+                name="autoOrientation"
+                onChange={handleChange}
+                type="bool"
+                value={modifiedData.autoOrientation}
               />
             </div>
           </div>

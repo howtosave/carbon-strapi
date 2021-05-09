@@ -10,6 +10,8 @@
 const _ = require('lodash');
 const uuid = require('uuid/v4');
 
+const usersPermissionsActions = require('../users-permissions-actions');
+
 module.exports = async () => {
   const pluginStore = strapi.store({
     environment: '',
@@ -75,6 +77,7 @@ module.exports = async () => {
       key: '',
       secret: '',
       callback: `${strapi.config.server.url}/auth/instagram/callback`,
+      scope: ['user_profile'],
     },
     vk: {
       enabled: false,
@@ -99,6 +102,41 @@ module.exports = async () => {
       secret: '',
       callback: `${strapi.config.server.url}/auth/apple/callback`,
       scope: ['name email'],
+    },
+    linkedin: {
+      enabled: false,
+      icon: 'linkedin',
+      key: '',
+      secret: '',
+      callback: `${strapi.config.server.url}/auth/linkedin/callback`,
+      scope: ['r_liteprofile', 'r_emailaddress'],
+    },
+    cognito: {
+      enabled: false,
+      icon: 'aws',
+      key: '',
+      secret: '',
+      subdomain: 'my.subdomain.com',
+      callback: `${strapi.config.server.url}/auth/cognito/callback`,
+      scope: ['email', 'openid', 'profile'],
+    },
+    reddit: {
+      enabled: false,
+      icon: 'reddit',
+      key: '',
+      secret: '',
+      state: true,
+      callback: `${strapi.config.server.url}/auth/reddit/callback`,
+      scope: ['identity'],
+    },
+    auth0: {
+      enabled: false,
+      icon: '',
+      key: '',
+      secret: '',
+      subdomain: 'my-tenant.eu',
+      callback: `${strapi.config.server.url}/auth/auth0/callback`,
+      scope: ['openid', 'email', 'profile'],
     },
   };
   const prevGrantConfig = (await pluginStore.get({ key: 'grant' })) || {};
@@ -164,8 +202,8 @@ module.exports = async () => {
       unique_email: true,
       allow_register: true,
       email_confirmation: false,
-      email_confirmation_redirection: `${strapi.config.admin.url}/admin`,
-      email_reset_password: `${strapi.config.admin.url}/admin`,
+      email_reset_password: null,
+      email_confirmation_redirection: null,
       default_role: 'authenticated',
     };
 
@@ -188,4 +226,8 @@ module.exports = async () => {
 
     strapi.reload.isWatching = true;
   }
+
+  await strapi.admin.services.permission.actionProvider.registerMany(
+    usersPermissionsActions.actions
+  );
 };
