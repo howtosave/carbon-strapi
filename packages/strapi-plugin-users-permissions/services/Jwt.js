@@ -57,7 +57,6 @@ module.exports = {
           if (err) {
             return reject(new Error('Invalid token.'));
           }
-          strapi.log.debug('[PK]>>> plugin-users-permissions#Jwt.verify(): ID:', tokenPayload.id);
           resolve(tokenPayload);
         }
       );
