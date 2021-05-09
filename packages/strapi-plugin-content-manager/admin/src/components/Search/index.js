@@ -8,27 +8,23 @@ import React, { memo } from 'react';
 import { isEmpty, upperFirst } from 'lodash';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import Cross from '../../icons/Cross';
-import Filter from '../../icons/Filter';
-import SearchIcon from '../../icons/Search';
-import { Wrapper, Infos, Clear } from './components';
+import { HeaderSearch } from 'strapi-helper-plugin';
+import getTrad from '../../utils/getTrad';
+
 const WAIT = 400;
 
 class Search extends React.Component {
   state = { value: this.props.initValue };
 
+  timer = null;
+
   componentDidUpdate(prevProps) {
     const { model, value } = this.props;
 
-    if (
-      prevProps.model !== model ||
-      (!isEmpty(prevProps.value) && isEmpty(value))
-    ) {
+    if (prevProps.model !== model || (!isEmpty(prevProps.value) && isEmpty(value))) {
       this.resetState();
     }
   }
-
-  timer = null;
 
   resetState = () => this.setState({ value: '' });
 
@@ -56,32 +52,17 @@ class Search extends React.Component {
     const { value } = this.state;
 
     return (
-      <Wrapper>
-        <div>
-          <SearchIcon />
-        </div>
-        <div>
-          <FormattedMessage id="content-manager.components.Search.placeholder">
-            {message => (
-              <input
-                onChange={this.handleChange}
-                placeholder={message}
-                type="text"
-                value={value}
-              />
-            )}
-          </FormattedMessage>
-          {value !== '' && (
-            <Clear onClick={this.handleClick}>
-              <Cross />
-            </Clear>
-          )}
-        </div>
-        <Infos>
-          <Filter />
-          {upperFirst(model)}
-        </Infos>
-      </Wrapper>
+      <FormattedMessage id={getTrad('components.Search.placeholder')}>
+        {placeholder => (
+          <HeaderSearch
+            label={upperFirst(model)}
+            onChange={this.handleChange}
+            onClear={this.handleClick}
+            placeholder={placeholder}
+            value={value}
+          />
+        )}
+      </FormattedMessage>
     );
   }
 }

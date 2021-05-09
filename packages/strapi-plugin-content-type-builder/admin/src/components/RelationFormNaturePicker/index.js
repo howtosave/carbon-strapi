@@ -29,18 +29,14 @@ const RelationFormNaturePicker = ({
   oneThatIsCreatingARelationWithAnother,
   target,
 }) => {
-  const { contentTypes } = useDataManager();
-  const relationsType =
+  const { contentTypes, modifiedData } = useDataManager();
+  const ctRelations = ['oneWay', 'oneToOne', 'oneToMany', 'manyToOne', 'manyToMany', 'manyWay'];
+  const componentRelations = ['oneWay', 'manyWay'];
+  const dataType =
     naturePickerType === 'contentType'
-      ? [
-          'oneWay',
-          'oneToOne',
-          'oneToMany',
-          'manyToOne',
-          'manyToMany',
-          'manyWay',
-        ]
-      : ['oneWay', 'manyWay'];
+      ? get(modifiedData, [naturePickerType, 'schema', 'kind'], '')
+      : naturePickerType;
+  const relationsType = dataType === 'collectionType' ? ctRelations : componentRelations;
 
   const areDisplayedNamesInverted = nature === 'manyToOne';
   const targetLabel = get(contentTypes, [target, 'schema', 'name'], 'unknown');
@@ -50,10 +46,7 @@ const RelationFormNaturePicker = ({
   const rightTarget = areDisplayedNamesInverted
     ? oneThatIsCreatingARelationWithAnother
     : targetLabel;
-  const leftDisplayedValue = pluralize(
-    leftTarget,
-    nature === 'manyToMany' ? 2 : 1
-  );
+  const leftDisplayedValue = pluralize(leftTarget, nature === 'manyToMany' ? 2 : 1);
 
   const rightDisplayedValue = pluralize(
     rightTarget,
@@ -88,7 +81,8 @@ const RelationFormNaturePicker = ({
         </div>
         <div className="nature-txt">
           <span>{truncate(leftDisplayedValue, { length: 24 })}</span>
-          &nbsp; <FormattedMessage id={getTrad(`relation.${nature}`)} />
+          &nbsp;
+          <FormattedMessage id={getTrad(`relation.${nature}`)} />
           &nbsp;
           <span>{truncate(rightDisplayedValue, { length: 24 })}</span>
         </div>

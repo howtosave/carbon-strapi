@@ -9,14 +9,8 @@ const { parseType } = require('strapi-utils');
  */
 
 module.exports = (mongoose = Mongoose) => {
-  mongoose.Schema.Types.Decimal = require('mongoose-float').loadType(
-    mongoose,
-    2
-  );
-  mongoose.Schema.Types.Float = require('mongoose-float').loadType(
-    mongoose,
-    20
-  );
+  mongoose.Schema.Types.Decimal = require('mongoose-float').loadType(mongoose, 2);
+  mongoose.Schema.Types.Float = require('mongoose-float').loadType(mongoose, 20);
 
   /**
    * Convert MongoDB ID to the stringify version as GraphQL throws an error if not.
@@ -27,8 +21,8 @@ module.exports = (mongoose = Mongoose) => {
     return this.toString();
   };
 
-  const convertType = mongooseType => {
-    switch (mongooseType.toLowerCase()) {
+  const convertType = (name, attr) => {
+    switch (attr.type.toLowerCase()) {
       case 'array':
         return { type: Array };
       case 'boolean':
@@ -67,13 +61,27 @@ module.exports = (mongoose = Mongoose) => {
         return { type: 'Number' };
       case 'uuid':
         return { type: 'ObjectId' };
-      case 'email':
       case 'enumeration':
+        return {
+          type: 'String',
+          enum: attr.enum.concat(null),
+          default: null,
+        };
+      case 'email':
       case 'password':
       case 'string':
       case 'text':
       case 'richtext':
         return { type: 'String' };
+      case 'uid': {
+        return {
+          type: 'String',
+          index: {
+            unique: true,
+            partialFilterExpression: { [name]: { $type: 'string' } },
+          },
+        };
+      }
       default:
         return undefined;
     }
@@ -95,6 +103,8 @@ module.exports = (mongoose = Mongoose) => {
   };
 
   const valueToId = value => {
+    if (Array.isArray(value)) return value.map(valueToId);
+
     if (isMongoId(value)) {
       return mongoose.Types.ObjectId(value);
     }

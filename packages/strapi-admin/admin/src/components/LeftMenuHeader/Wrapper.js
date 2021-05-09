@@ -5,7 +5,8 @@ import Logo from '../../assets/images/logo-strapi.png';
 
 const Wrapper = styled.div`
   background-color: #007eff;
-  height: ${props => props.theme.main.sizes.header.height};
+  padding-left: 2rem;
+  height: ${props => props.theme.main.sizes.leftMenu.height};
 
   .leftMenuHeaderLink {
     &:hover {
@@ -15,19 +16,16 @@ const Wrapper = styled.div`
 
   .projectName {
     display: block;
-    height: 100%;
     width: 100%;
-    text-align: center;
-    height: ${props => props.theme.main.sizes.header.height};
-    vertical-align: middle;
+    height: ${props => props.theme.main.sizes.leftMenu.height};
     font-size: 2rem;
     letter-spacing: 0.2rem;
     color: $white;
 
     background-image: url(${Logo});
     background-repeat: no-repeat;
-    background-position: center center;
-    background-size: auto 3rem;
+    background-position: left center;
+    background-size: auto 2.5rem;
   }
 `;
 

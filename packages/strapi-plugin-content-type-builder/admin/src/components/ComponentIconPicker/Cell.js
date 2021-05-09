@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+/* eslint-disable indent */
 const Cell = styled.div`
   width: 54px;
   height: 100%;
@@ -25,6 +26,8 @@ const Cell = styled.div`
         }
       `;
     }
+
+    return '';
   }}
 
   > svg {

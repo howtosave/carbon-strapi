@@ -4,19 +4,14 @@
  */
 
 const _ = require('lodash');
-const {
-  convertRestQueryParams,
-  buildQuery,
-  models: modelUtils,
-} = require('strapi-utils');
+const { convertRestQueryParams, buildQuery } = require('strapi-utils');
 
 const { findComponentByGlobalId } = require('./utils/helpers');
 
 const hasPK = (obj, model) => _.has(obj, model.primaryKey) || _.has(obj, 'id');
-const getPK = (obj, model) =>
-  _.has(obj, model.primaryKey) ? obj[model.primaryKey] : obj.id;
+const getPK = (obj, model) => (_.has(obj, model.primaryKey) ? obj[model.primaryKey] : obj.id);
 
-module.exports = ({ model, modelKey, strapi }) => {
+module.exports = ({ model, strapi }) => {
   const assocKeys = model.associations.map(ast => ast.alias);
   const componentKeys = Object.keys(model.attributes).filter(key =>
     ['component', 'dynamiczone'].includes(model.attributes[key].type)
@@ -77,9 +72,7 @@ module.exports = ({ model, modelKey, strapi }) => {
           validateNonRepeatableInput(componentValue, { key, ...attr });
           if (componentValue === null) continue;
 
-          const componentEntry = await strapi
-            .query(component)
-            .create(componentValue);
+          const componentEntry = await strapi.query(component).create(componentValue);
           entry[key] = [
             {
               kind: componentModel.globalId,
@@ -174,9 +167,7 @@ module.exports = ({ model, modelKey, strapi }) => {
           });
 
           const components = await Promise.all(
-            componentValue.map(value =>
-              updateOrCreateComponent({ componentUID, value })
-            )
+            componentValue.map(value => updateOrCreateComponent({ componentUID, value }))
           );
           const componentsArr = components.map(component => ({
             kind: componentModel.globalId,
@@ -222,14 +213,12 @@ module.exports = ({ model, modelKey, strapi }) => {
         const dynamiczones = await Promise.all(
           dynamiczoneValues.map(value => {
             const componentUID = value.__component;
-            return updateOrCreateComponent({ componentUID, value }).then(
-              entity => {
-                return {
-                  componentUID,
-                  entity,
-                };
-              }
-            );
+            return updateOrCreateComponent({ componentUID, value }).then(entity => {
+              return {
+                componentUID,
+                entity,
+              };
+            });
           })
         );
 
@@ -273,9 +262,7 @@ module.exports = ({ model, modelKey, strapi }) => {
 
     // verify the provided ids are realted to this entity.
     idsToKeep.forEach(({ id, componentUID }) => {
-      if (
-        !allIds.find(el => el.id === id && el.componentUID === componentUID)
-      ) {
+      if (!allIds.find(el => el.id === id && el.componentUID === componentUID)) {
         const err = new Error(
           `Some of the provided components in ${key} are not related to the entity`
         );
@@ -285,9 +272,7 @@ module.exports = ({ model, modelKey, strapi }) => {
     });
 
     const idsToDelete = allIds.reduce((acc, { id, componentUID }) => {
-      if (
-        !idsToKeep.find(el => el.id === id && el.componentUID === componentUID)
-      ) {
+      if (!idsToKeep.find(el => el.id === id && el.componentUID === componentUID)) {
         acc.push({
           id,
           componentUID,
@@ -317,14 +302,8 @@ module.exports = ({ model, modelKey, strapi }) => {
     }
   }
 
-  async function deleteOldComponents(
-    entry,
-    componentValue,
-    { key, componentModel }
-  ) {
-    const componentArr = Array.isArray(componentValue)
-      ? componentValue
-      : [componentValue];
+  async function deleteOldComponents(entry, componentValue, { key, componentModel }) {
+    const componentArr = Array.isArray(componentValue) ? componentValue : [componentValue];
 
     const idsToKeep = componentArr
       .filter(val => hasPK(val, componentModel))
@@ -335,9 +314,9 @@ module.exports = ({ model, modelKey, strapi }) => {
       .filter(el => el.ref)
       .map(el => el.ref._id);
 
-    // verify the provided ids are realted to this entity.
+    // verify the provided ids are related to this entity.
     idsToKeep.forEach(id => {
-      if (allIds.findIndex(currentId => currentId.toString() === id) === -1) {
+      if (allIds.findIndex(currentId => currentId.toString() === id.toString()) === -1) {
         const err = new Error(
           `Some of the provided components in ${key} are not related to the entity`
         );
@@ -352,9 +331,7 @@ module.exports = ({ model, modelKey, strapi }) => {
     }, []);
 
     if (idsToDelete.length > 0) {
-      await strapi
-        .query(componentModel.uid)
-        .delete({ [`${model.primaryKey}_in`]: idsToDelete });
+      await strapi.query(componentModel.uid).delete({ [`${model.primaryKey}_in`]: idsToDelete });
     }
   }
 
@@ -397,7 +374,7 @@ module.exports = ({ model, modelKey, strapi }) => {
           await Promise.all(
             Object.keys(deleteMap).map(componentUID => {
               return strapi.query(componentUID).delete({
-                [`${model.primaryKey}_in`]: idsToDelete[componentUID],
+                [`${model.primaryKey}_in`]: deleteMap[componentUID],
               });
             })
           );
@@ -415,25 +392,12 @@ module.exports = ({ model, modelKey, strapi }) => {
       model,
       filters,
       populate: populateOpt,
-    }).then(results =>
-      results.map(result => (result ? result.toObject() : null))
-    );
+    }).then(results => results.map(result => (result ? result.toObject() : null)));
   }
 
   async function findOne(params, populate) {
-    const primaryKey = getPK(params, model);
-
-    if (primaryKey) {
-      params = {
-        [model.primaryKey]: primaryKey,
-      };
-    }
-
-    const entry = await model
-      .findOne(params)
-      .populate(populate || defaultPopulate);
-
-    return entry ? entry.toObject() : null;
+    const entries = await find({ ...params, _limit: 1 }, populate);
+    return entries[0] || null;
   }
 
   function count(params) {
@@ -463,14 +427,6 @@ module.exports = ({ model, modelKey, strapi }) => {
   }
 
   async function update(params, values) {
-    const primaryKey = getPK(params, model);
-
-    if (primaryKey) {
-      params = {
-        [model.primaryKey]: primaryKey,
-      };
-    }
-
     const entry = await model.findOne(params);
 
     if (!entry) {
@@ -493,17 +449,21 @@ module.exports = ({ model, modelKey, strapi }) => {
   }
 
   async function deleteMany(params) {
-    const primaryKey = getPK(params, model);
-
-    if (primaryKey) return deleteOne(params);
+    if (params[model.primaryKey]) {
+      const entries = await find({ ...params, _limit: 1 });
+      if (entries.length > 0) {
+        return deleteOne(entries[0][model.primaryKey]);
+      }
+      return null;
+    }
 
     const entries = await find(params);
-    return await Promise.all(entries.map(entry => deleteOne({ id: entry.id })));
+    return Promise.all(entries.map(entry => deleteOne(entry[model.primaryKey])));
   }
 
-  async function deleteOne(params) {
+  async function deleteOne(id) {
     const entry = await model
-      .findOneAndRemove({ [model.primaryKey]: getPK(params, model) })
+      .findOneAndRemove({ [model.primaryKey]: id })
       .populate(defaultPopulate);
 
     if (!entry) {
@@ -514,57 +474,32 @@ module.exports = ({ model, modelKey, strapi }) => {
 
     await deleteComponents(entry);
 
-    await Promise.all(
-      model.associations.map(async association => {
-        if (!association.via || !entry._id || association.dominant) {
-          return true;
-        }
-
-        const search =
-          _.endsWith(association.nature, 'One') ||
-          association.nature === 'oneToMany'
-            ? { [association.via]: entry._id }
-            : { [association.via]: { $in: [entry._id] } };
-        const update =
-          _.endsWith(association.nature, 'One') ||
-          association.nature === 'oneToMany'
-            ? { [association.via]: null }
-            : { $pull: { [association.via]: entry._id } };
-
-        // Retrieve model.
-        const model = association.plugin
-          ? strapi.plugins[association.plugin].models[
-              association.model || association.collection
-            ]
-          : strapi.models[association.model || association.collection];
-
-        return model.updateMany(search, update);
-      })
-    );
+    await model.deleteRelations(entry);
 
     return entry.toObject ? entry.toObject() : null;
   }
 
   function search(params, populate) {
-    // Convert `params` object to filters compatible with Mongo.
-    const filters = modelUtils.convertParams(modelKey, params);
+    const populateOpt = populate || defaultPopulate;
 
-    const $or = buildSearchOr(model, params._q);
+    const filters = convertRestQueryParams(_.omit(params, '_q'));
 
-    return model
-      .find({ $or })
-      .sort(filters.sort)
-      .skip(filters.start)
-      .limit(filters.limit)
-      .populate(populate || defaultPopulate)
-      .then(results =>
-        results.map(result => (result ? result.toObject() : null))
-      );
+    return buildQuery({
+      model,
+      filters,
+      searchParam: params._q,
+      populate: populateOpt,
+    }).then(results => results.map(result => (result ? result.toObject() : null)));
   }
 
   function countSearch(params) {
-    const $or = buildSearchOr(model, params._q);
-    return model.find({ $or }).countDocuments();
+    const filters = convertRestQueryParams(_.omit(params, '_q'));
+
+    return buildQuery({
+      model,
+      filters,
+      searchParam: params._q,
+    }).count();
   }
 
   return {
@@ -577,33 +512,6 @@ module.exports = ({ model, modelKey, strapi }) => {
     search,
     countSearch,
   };
-};
-
-const buildSearchOr = (model, query) => {
-  return Object.keys(model.attributes).reduce((acc, curr) => {
-    switch (model.attributes[curr].type) {
-      case 'integer':
-      case 'float':
-      case 'decimal':
-        if (!_.isNaN(_.toNumber(query))) {
-          return acc.concat({ [curr]: query });
-        }
-
-        return acc;
-      case 'string':
-      case 'text':
-      case 'password':
-        return acc.concat({ [curr]: { $regex: query, $options: 'i' } });
-      case 'boolean':
-        if (query === 'true' || query === 'false') {
-          return acc.concat({ [curr]: query === 'true' });
-        }
-
-        return acc;
-      default:
-        return acc;
-    }
-  }, []);
 };
 
 function validateRepeatableInput(value, { key, min, max, required }) {
@@ -623,13 +531,8 @@ function validateRepeatableInput(value, { key, min, max, required }) {
     }
   });
 
-  if (
-    (required === true || (required !== true && value.length > 0)) &&
-    (min && value.length < min)
-  ) {
-    const err = new Error(
-      `Component ${key} must contain at least ${min} items`
-    );
+  if ((required === true || (required !== true && value.length > 0)) && min && value.length < min) {
+    const err = new Error(`Component ${key} must contain at least ${min} items`);
     err.status = 400;
     throw err;
   }
@@ -655,10 +558,7 @@ function validateNonRepeatableInput(value, { key, required }) {
   }
 }
 
-function validateDynamiczoneInput(
-  value,
-  { key, min, max, components, required }
-) {
+function validateDynamiczoneInput(value, { key, min, max, components, required }) {
   if (!Array.isArray(value)) {
     const err = new Error(`Dynamiczone ${key} is invalid. Expected an array`);
     err.status = 400;
@@ -689,20 +589,13 @@ function validateDynamiczoneInput(
     }
   });
 
-  if (
-    (required === true || (required !== true && value.length > 0)) &&
-    (min && value.length < min)
-  ) {
-    const err = new Error(
-      `Dynamiczone ${key} must contain at least ${min} items`
-    );
+  if ((required === true || (required !== true && value.length > 0)) && min && value.length < min) {
+    const err = new Error(`Dynamiczone ${key} must contain at least ${min} items`);
     err.status = 400;
     throw err;
   }
   if (max && value.length > max) {
-    const err = new Error(
-      `Dynamiczone ${key} must contain at most ${max} items`
-    );
+    const err = new Error(`Dynamiczone ${key} must contain at most ${max} items`);
     err.status = 400;
     throw err;
   }

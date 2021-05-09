@@ -24,16 +24,15 @@ module.exports = strapi => {
       _.forEach(strapi.config.routes, value => {
         composeEndpoint(value, { router: strapi.router });
       });
-      //[PTK] API, admin 및 plugins의 router에 prefix를 적용함
-      const prefix = _.get(strapi.config, 'currentEnvironment.request.router.prefix', '');
-      strapi.router.prefix(prefix);
+
+      strapi.router.prefix(strapi.config.get('middleware.settings.router.prefix', ''));
 
       if (!_.isEmpty(_.get(strapi.admin, 'config.routes', false))) {
         // Create router for admin.
         // Prefix router with the admin's name.
-        //[PTK] admin router에 prefix를 적용함
         const router = new Router({
-          prefix: `${prefix}/admin`,
+          // [PTK] fix prefix-url issue
+          prefix: `${strapi.config.get('middleware.settings.router.prefix', '')}/admin`,
         });
 
         _.forEach(strapi.admin.config.routes, value => {
@@ -47,34 +46,26 @@ module.exports = strapi => {
       if (strapi.plugins) {
         // Parse each plugin's routes.
         _.forEach(strapi.plugins, (plugin, pluginName) => {
-          //[PTK] plugins router에 prefix를 적용함
+
           const router = new Router({
-            prefix: `${prefix}/${pluginName}`,
+            // [PTK] fix prefix-url issue
+            prefix: `${strapi.config.get('middleware.settings.router.prefix', '')}/${pluginName}`,
           });
 
-          // Exclude routes with prefix.
-          const excludedRoutes = _.omitBy(
-            plugin.config.routes,
-            o => !_.has(o.config, 'prefix')
-          );
-
-          _.forEach(
-            _.omit(plugin.config.routes, _.keys(excludedRoutes)),
-            value => {
-              composeEndpoint(value, { plugin: pluginName, router });
-            }
-          );
-
-          // /!\ Could override main router's routes.
-          if (!_.isEmpty(excludedRoutes)) {
-            _.forEach(excludedRoutes, value => {
-              composeEndpoint(value, {
-                plugin: pluginName,
-                router: strapi.router,
-              });
+          (plugin.config.routes || []).forEach(route => {
+            const hasPrefix = _.has(route.config, 'prefix');
+            composeEndpoint(route, {
+              plugin: pluginName,
+              router: hasPrefix ? strapi.router : router,
             });
-          }
+          });
 
+          // [PTK] router tracing
+          //strapi.log.debug(">>>>>>>>>> PLUGIN ROUTER:", pluginName);
+          //router.stack.forEach((item) => {
+          //  strapi.log.debug('  ', item.methods, '\t', item.path);
+          //});
+        
           // Mount plugin router
           strapi.app.use(router.routes()).use(router.allowedMethods());
         });

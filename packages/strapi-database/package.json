@@ -1,6 +1,6 @@
 {
   "name": "strapi-database",
-  "version": "3.0.0-beta.18.3",
+  "version": "3.0.6",
   "description": "Strapi's database layer",
   "homepage": "http://strapi.io",
   "main": "./lib/index.js",
@@ -23,11 +23,12 @@
     "url": "https://github.com/strapi/strapi/issues"
   },
   "engines": {
-    "node": ">=10.0.0",
+    "node": ">=10.10.0",
     "npm": ">=6.0.0"
   },
   "license": "MIT",
   "dependencies": {
+    "lodash": "^4.17.11",
     "verror": "^1.10.0"
   }
 }

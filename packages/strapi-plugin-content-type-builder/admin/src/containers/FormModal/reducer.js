@@ -1,12 +1,9 @@
-import { fromJS } from 'immutable';
+import { fromJS, List } from 'immutable';
 import pluralize from 'pluralize';
 import { snakeCase } from 'lodash';
 import makeUnique from '../../utils/makeUnique';
 import { createComponentUid } from './utils/createUid';
-import {
-  shouldPluralizeName,
-  shouldPluralizeTargetAttribute,
-} from './utils/relations';
+import { shouldPluralizeName, shouldPluralizeTargetAttribute } from './utils/relations';
 
 const initialState = fromJS({
   formErrors: {},
@@ -22,15 +19,17 @@ const reducer = (state, action) => {
       const { name, components, shouldAddComponents } = action;
 
       return state.updateIn(['modifiedData', name], list => {
+        let updatedList = list;
+
         if (shouldAddComponents) {
-          return makeUnique(list.concat(components));
+          updatedList = list.concat(components);
         } else {
-          return makeUnique(
-            list.filter(comp => {
-              return components.indexOf(comp) === -1;
-            })
-          );
+          updatedList = list.filter(comp => {
+            return components.indexOf(comp) === -1;
+          });
         }
+
+        return List(makeUnique(updatedList.toJS()));
       });
     }
     case 'ON_CHANGE':
@@ -41,6 +40,16 @@ const reducer = (state, action) => {
           value,
           oneThatIsCreatingARelationWithAnother,
         } = action;
+        const hasDefaultValue = Boolean(obj.getIn(['default']));
+
+        // There is no need to remove the default key if the default value isn't defined
+        if (hasDefaultValue && keys.length === 1 && keys.includes('type')) {
+          const previousType = obj.getIn(['type']);
+
+          if (previousType && ['date', 'datetime', 'time'].includes(previousType)) {
+            return obj.updateIn(keys, () => value).remove('default');
+          }
+        }
 
         if (keys.length === 1 && keys.includes('nature')) {
           return obj
@@ -61,9 +70,7 @@ const reducer = (state, action) => {
               }
 
               return pluralize(
-                oldValue === '-'
-                  ? snakeCase(oneThatIsCreatingARelationWithAnother)
-                  : oldValue,
+                oldValue === '-' ? snakeCase(oneThatIsCreatingARelationWithAnother) : oldValue,
                 shouldPluralizeTargetAttribute(value)
               );
             })
@@ -99,6 +106,33 @@ const reducer = (state, action) => {
 
         return obj.updateIn(keys, () => value);
       });
+    case 'ON_CHANGE_ALLOWED_TYPE': {
+      if (action.name === 'all') {
+        return state.updateIn(['modifiedData', 'allowedTypes'], () => {
+          if (action.value) {
+            return fromJS(['images', 'videos', 'files']);
+          }
+
+          return null;
+        });
+      }
+
+      return state.updateIn(['modifiedData', 'allowedTypes'], currentList => {
+        let list = currentList || fromJS([]);
+
+        if (list.includes(action.name)) {
+          list = list.filter(v => v !== action.name);
+
+          if (list.size === 0) {
+            return null;
+          }
+
+          return list;
+        }
+
+        return list.push(action.name);
+      });
+    }
     case 'RESET_PROPS':
       return initialState;
     case 'RESET_PROPS_AND_SET_FORM_FOR_ADDING_AN_EXISTING_COMPO': {
@@ -109,10 +143,7 @@ const reducer = (state, action) => {
     }
     case 'RESET_PROPS_AND_SAVE_CURRENT_DATA': {
       // This is run when the user has created a new component
-      const componentToCreate = state.getIn([
-        'modifiedData',
-        'componentToCreate',
-      ]);
+      const componentToCreate = state.getIn(['modifiedData', 'componentToCreate']);
       const modifiedData = fromJS({
         name: componentToCreate.get('name'),
         type: 'component',
@@ -184,7 +215,11 @@ const reducer = (state, action) => {
       } else if (attributeType === 'number' || attributeType === 'date') {
         dataToSet = {};
       } else if (attributeType === 'media') {
-        dataToSet = { type: 'media', multiple: true };
+        dataToSet = {
+          allowedTypes: ['images', 'files', 'videos'],
+          type: 'media',
+          multiple: true,
+        };
       } else if (attributeType === 'enumeration') {
         dataToSet = { type: 'enumeration', enum: [] };
       } else if (attributeType === 'relation') {

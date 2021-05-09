@@ -2,8 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { SelectWrapper, SelectNav } from 'strapi-helper-plugin';
 import { ErrorMessage } from '@buffetjs/styles';
-import CreatableSelect from '../CreatableSelect';
+import AllowedTypesSelect from '../AllowedTypesSelect';
 import ComponentSelect from '../ComponentSelect';
+import CreatableSelect from '../CreatableSelect';
+
+/* eslint-disable no-nested-ternary */
 
 const WrapperSelect = ({ error, label, name, type, ...rest }) => {
   const styles = {
@@ -18,7 +21,7 @@ const WrapperSelect = ({ error, label, name, type, ...rest }) => {
       border: state.isFocused
         ? '1px solid #78caff !important'
         : error
-        ? '1px solid red !important'
+        ? '1px solid #F64D0A !important'
         : '1px solid #E3E9F3 !important',
       borderRadius: '2px !important',
     }),
@@ -41,8 +44,15 @@ const WrapperSelect = ({ error, label, name, type, ...rest }) => {
     },
   };
 
-  const Component =
-    type === 'creatableSelect' ? CreatableSelect : ComponentSelect;
+  let Component;
+
+  if (type === 'allowedTypesSelect') {
+    Component = AllowedTypesSelect;
+  } else if (type === 'creatableSelect') {
+    Component = CreatableSelect;
+  } else {
+    Component = ComponentSelect;
+  }
 
   return (
     <SelectWrapper className="form-group" style={{ marginBottom: 0 }}>
@@ -54,9 +64,7 @@ const WrapperSelect = ({ error, label, name, type, ...rest }) => {
       <Component name={name} {...rest} styles={styles} />
 
       {error && (
-        <ErrorMessage
-          style={{ paddingTop: 11, paddingBottom: 0, marginBottom: 12 }}
-        >
+        <ErrorMessage style={{ paddingTop: 11, paddingBottom: 0, marginBottom: 12 }}>
           {error}
         </ErrorMessage>
       )}

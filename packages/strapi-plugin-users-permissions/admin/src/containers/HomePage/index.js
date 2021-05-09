@@ -31,15 +31,57 @@ import {
   submit,
   unsetDataToEdit,
 } from './actions';
-import reducer from './reducer';
 import saga from './saga';
 import checkFormValidity from './checkFormValidity';
+
+/* eslint-disable consistent-return */
+/* eslint-disable react/sort-comp */
+/* eslint-disable react/no-access-state-in-setstate */
+
 const keyBoardShortCuts = [18, 78];
 
 export class HomePage extends React.Component {
   state = { mapKey: {}, showModalEdit: false };
 
-  static contextType = GlobalContext;
+  headerNavLinks = [
+    {
+      name: getTrad('HeaderNav.link.roles'),
+      to: `/plugins/${pluginId}/roles`,
+    },
+    {
+      name: getTrad('HeaderNav.link.providers'),
+      to: `/plugins/${pluginId}/providers`,
+    },
+    {
+      name: getTrad('HeaderNav.link.emailTemplates'),
+      to: `/plugins/${pluginId}/email-templates`,
+    },
+    {
+      name: getTrad('HeaderNav.link.advancedSettings'),
+      to: `/plugins/${pluginId}/advanced`,
+    },
+  ];
+
+  pluginHeaderActions = [
+    {
+      label: this.context.formatMessage({
+        id: getTrad('EditPage.cancel'),
+      }),
+      color: 'cancel',
+      onClick: () => this.props.cancelChanges(),
+      type: 'button',
+      key: 'button-cancel',
+    },
+    {
+      color: 'success',
+      label: this.context.formatMessage({
+        id: getTrad('EditPage.submit'),
+      }),
+      onClick: () => this.props.submit(this.props.match.params.settingType),
+      type: 'submit',
+      key: 'button-submit',
+    },
+  ];
 
   componentDidMount() {
     this.props.fetchData(this.props.match.params.settingType);
@@ -56,8 +98,7 @@ export class HomePage extends React.Component {
   UNSAFE_componentWillUpdate(nextProps) {
     const allowedPaths = ['roles', 'providers', 'email-templates', 'advanced'];
     const shouldRedirect =
-      allowedPaths.filter(el => el === nextProps.match.params.settingType)
-        .length === 0;
+      allowedPaths.filter(el => el === nextProps.match.params.settingType).length === 0;
 
     if (shouldRedirect) {
       this.props.history.push('/404');
@@ -69,9 +110,7 @@ export class HomePage extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (
-      prevProps.match.params.settingType !== this.props.match.params.settingType
-    ) {
+    if (prevProps.match.params.settingType !== this.props.match.params.settingType) {
       this.props.fetchData(this.props.match.params.settingType);
     }
   }
@@ -116,10 +155,7 @@ export class HomePage extends React.Component {
       this.getEndPoint(),
       this.props.dataToEdit,
     ]);
-    const initObject = get(this.props.initialData, [
-      this.getEndPoint(),
-      this.props.dataToEdit,
-    ]);
+    const initObject = get(this.props.initialData, [this.getEndPoint(), this.props.dataToEdit]);
     const formErrors = checkFormValidity(
       this.props.match.params.settingType,
       modifiedObject,
@@ -138,62 +174,20 @@ export class HomePage extends React.Component {
     }
   };
 
-  headerNavLinks = [
-    {
-      name: getTrad('HeaderNav.link.roles'),
-      to: `/plugins/${pluginId}/roles`,
-    },
-    {
-      name: getTrad('HeaderNav.link.providers'),
-      to: `/plugins/${pluginId}/providers`,
-    },
-    {
-      name: getTrad('HeaderNav.link.emailTemplates'),
-      to: `/plugins/${pluginId}/email-templates`,
-    },
-    {
-      name: getTrad('HeaderNav.link.advancedSettings'),
-      to: `/plugins/${pluginId}/advanced`,
-    },
-  ];
-
   isAdvanded = () => {
     return this.getEndPoint() === 'advanced';
   };
-
-  pluginHeaderActions = [
-    {
-      label: this.context.formatMessage({
-        id: getTrad('EditPage.cancel'),
-      }),
-      color: 'cancel',
-      onClick: () => this.props.cancelChanges(),
-      type: 'button',
-      key: 'button-cancel',
-    },
-    {
-      color: 'success',
-      label: this.context.formatMessage({
-        id: getTrad('EditPage.submit'),
-      }),
-      onClick: () => this.props.submit(this.props.match.params.settingType),
-      type: 'submit',
-      key: 'button-submit',
-    },
-  ];
 
   showLoaders = () => {
     const { data, isLoading, modifiedData } = this.props;
 
     return (
-      (isLoading &&
-        get(data, this.getEndPoint()) === undefined &&
-        !this.isAdvanded()) ||
-      (isLoading &&
-        this.isAdvanded() &&
-        get(modifiedData, this.getEndPoint()) === undefined)
+      (isLoading && get(data, this.getEndPoint()) === undefined && !this.isAdvanded()) ||
+      (isLoading && this.isAdvanded() && get(modifiedData, this.getEndPoint()) === undefined)
     );
   };
+
+  static contextType = GlobalContext;
 
   render() {
     const {
@@ -207,13 +201,11 @@ export class HomePage extends React.Component {
     } = this.props;
     const { formatMessage } = this.context;
     const headerActions =
-      match.params.settingType === 'advanced' &&
-      !isEqual(modifiedData, initialData)
+      match.params.settingType === 'advanced' && !isEqual(modifiedData, initialData)
         ? this.pluginHeaderActions
         : [];
     const noButtonList =
-      match.params.settingType === 'email-templates' ||
-      match.params.settingType === 'providers';
+      match.params.settingType === 'email-templates' || match.params.settingType === 'providers';
     const values = get(modifiedData, this.getEndPoint(), {});
 
     return (
@@ -237,10 +229,7 @@ export class HomePage extends React.Component {
               })}
               actions={headerActions}
             />
-            <HeaderNav
-              links={this.headerNavLinks}
-              style={{ marginTop: '4.6rem' }}
-            />
+            <HeaderNav links={this.headerNavLinks} style={{ marginTop: '4.6rem' }} />
             {!this.isAdvanded() ? (
               <List
                 data={get(data, this.getEndPoint(), [])}
@@ -319,19 +308,8 @@ function mapDispatchToProps(dispatch) {
 
 const mapStateToProps = selectHomePage();
 
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps
-);
-const withReducer = strapi.injectReducer({
-  key: 'homePage',
-  reducer,
-  pluginId,
-});
+const withConnect = connect(mapStateToProps, mapDispatchToProps);
+
 const withSaga = strapi.injectSaga({ key: 'homePage', saga, pluginId });
 
-export default compose(
-  withReducer,
-  withSaga,
-  withConnect
-)(injectIntl(HomePage));
+export default compose(withSaga, withConnect)(injectIntl(HomePage));

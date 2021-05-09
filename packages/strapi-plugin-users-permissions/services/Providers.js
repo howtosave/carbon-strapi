@@ -8,8 +8,35 @@
 const _ = require('lodash');
 const request = require('request');
 
-// Purest strategies.<
-const Purest = require('purest');
+// Purest strategies.
+const purest = require('purest')({ request });
+const purestConfig = require('@purest/providers');
+
+// [PTK] parse id_token for apple sign in
+function base64urlUnescape(str) {
+  str += new Array(5 - str.length % 4).join('=');
+  return str.replace(/\-/g, '+').replace(/_/g, '/');
+}
+function unescapeAppleIdToken(idToken, cb) {
+  // Jwt format: header . body . signature
+  var segments = idToken.split('.');
+  if (segments.length > 3) return cb(new Error('Jwt cannot be parsed'));
+  try {
+    // parse body only
+    const body = JSON.parse(Buffer.from(base64urlUnescape(segments[1]), 'base64'));
+    if (new Date(body.exp*1000) < new Date()) {
+      return cb(new Error('Jwt is expired'));
+    }
+
+    cb(null, {
+      username: body.email.split('@')[0],
+      email: body.email,
+    });
+  } 
+  catch(e) {
+    return cb(e);
+  }
+}
 
 /**
  * Connect thanks to a third-party provider.
@@ -54,10 +81,7 @@ exports.connect = (provider, query) => {
           })
           .get();
 
-        if (
-          _.isEmpty(_.find(users, { provider })) &&
-          !advanced.allow_register
-        ) {
+        if (_.isEmpty(_.find(users, { provider })) && !advanced.allow_register) {
           return resolve([
             null,
             [{ messages: [{ id: 'Auth.advanced.allow_register' }] }],
@@ -94,9 +118,7 @@ exports.connect = (provider, query) => {
           confirmed: true,
         });
 
-        const createdUser = await strapi
-          .query('user', 'users-permissions')
-          .create(params);
+        const createdUser = await strapi.query('user', 'users-permissions').create(params);
 
         return resolve([createdUser, null]);
       } catch (err) {
@@ -127,7 +149,7 @@ const getProfile = async (provider, query, callback) => {
 
   switch (provider) {
     case 'discord': {
-      const discord = new Purest({
+      const discord = purest({
         provider: 'discord',
         config: {
           discord: {
@@ -165,8 +187,9 @@ const getProfile = async (provider, query, callback) => {
       break;
     }
     case 'facebook': {
-      const facebook = new Purest({
+      const facebook = purest({
         provider: 'facebook',
+        config: purestConfig,
       });
 
       facebook
@@ -186,29 +209,7 @@ const getProfile = async (provider, query, callback) => {
       break;
     }
     case 'google': {
-      const config = {
-        google: {
-          'https://www.googleapis.com': {
-            __domain: {
-              auth: {
-                auth: { bearer: '[0]' },
-              },
-            },
-            '{endpoint}': {
-              __path: {
-                alias: '__default',
-              },
-            },
-            'oauth/[version]/{endpoint}': {
-              __path: {
-                alias: 'oauth',
-                version: 'v3',
-              },
-            },
-          },
-        },
-      };
-      const google = new Purest({ provider: 'google', config });
+      const google = purest({ provider: 'google', config: purestConfig });
 
       google
         .query('oauth')
@@ -227,8 +228,9 @@ const getProfile = async (provider, query, callback) => {
       break;
     }
     case 'github': {
-      const github = new Purest({
+      const github = purest({
         provider: 'github',
+        config: purestConfig,
         defaults: {
           headers: {
             'user-agent': 'strapi',
@@ -236,75 +238,47 @@ const getProfile = async (provider, query, callback) => {
         },
       });
 
-      request.post(
-        {
-          url: 'https://github.com/login/oauth/access_token',
-          form: {
-            client_id: grant.github.key,
-            client_secret: grant.github.secret,
-            code: access_token,
-          },
-        },
-        (err, res, body) => {
+      github
+        .query()
+        .get('user')
+        .auth(access_token)
+        .request((err, res, userbody) => {
+          if (err) {
+            return callback(err);
+          }
+
+          // This is the public email on the github profile
+          if (userbody.email) {
+            return callback(null, {
+              username: userbody.login,
+              email: userbody.email,
+            });
+          }
+
+          // Get the email with Github's user/emails API
           github
             .query()
-            .get('user')
-            .auth(body.split('&')[0].split('=')[1])
-            .request((err, res, userbody) => {
+            .get('user/emails')
+            .auth(access_token)
+            .request((err, res, emailsbody) => {
               if (err) {
                 return callback(err);
               }
 
-              // This is the public email on the github profile
-              if (userbody.email) {
-                return callback(null, {
-                  username: userbody.login,
-                  email: userbody.email,
-                });
-              }
-
-              // Get the email with Github's user/emails API
-              github
-                .query()
-                .get('user/emails')
-                .auth(body.split('&')[0].split('=')[1])
-                .request((err, res, emailsbody) => {
-                  if (err) {
-                    return callback(err);
-                  }
-
-                  return callback(null, {
-                    username: userbody.login,
-                    email: Array.isArray(emailsbody)
-                      ? emailsbody.find(email => email.primary === true).email
-                      : null,
-                  });
-                });
+              return callback(null, {
+                username: userbody.login,
+                email: Array.isArray(emailsbody)
+                  ? emailsbody.find(email => email.primary === true).email
+                  : null,
+              });
             });
-        }
-      );
+        });
       break;
     }
     case 'microsoft': {
-      const microsoft = new Purest({
+      const microsoft = purest({
         provider: 'microsoft',
-        config: {
-          microsoft: {
-            'https://graph.microsoft.com': {
-              __domain: {
-                auth: {
-                  auth: { bearer: '[0]' },
-                },
-              },
-              '[version]/{endpoint}': {
-                __path: {
-                  alias: '__default',
-                  version: 'v1.0',
-                },
-              },
-            },
-          },
-        },
+        config: purestConfig,
       });
 
       microsoft
@@ -324,8 +298,9 @@ const getProfile = async (provider, query, callback) => {
       break;
     }
     case 'twitter': {
-      const twitter = new Purest({
+      const twitter = purest({
         provider: 'twitter',
+        config: purestConfig,
         key: grant.twitter.key,
         secret: grant.twitter.secret,
       });
@@ -348,7 +323,8 @@ const getProfile = async (provider, query, callback) => {
       break;
     }
     case 'instagram': {
-      const instagram = new Purest({
+      const instagram = purest({
+        config: purestConfig,
         provider: 'instagram',
         key: grant.instagram.key,
         secret: grant.instagram.secret,
@@ -370,6 +346,79 @@ const getProfile = async (provider, query, callback) => {
         });
       break;
     }
+    case 'vk': {
+      const vk = purest({
+        provider: 'vk',
+        config: purestConfig,
+      });
+
+      vk.query()
+        .get('users.get')
+        .qs({ access_token, id: query.raw.user_id, v: '5.013' })
+        .request((err, res, body) => {
+          if (err) {
+            callback(err);
+          } else {
+            callback(null, {
+              username: `${body.response[0].last_name} ${body.response[0].first_name}`,
+              email: query.raw.email,
+            });
+          }
+        });
+      break;
+    }
+    case 'twitch': {
+      const twitch = purest({
+        provider: 'twitch',
+        config: {
+          twitch: {
+            'https://api.twitch.tv': {
+              __domain: {
+                auth: {
+                  headers: {
+                    Authorization: 'Bearer [0]',
+                    'Client-ID': '[1]',
+                  },
+                },
+              },
+              'helix/{endpoint}': {
+                __path: {
+                  alias: '__default',
+                },
+              },
+              'oauth2/{endpoint}': {
+                __path: {
+                  alias: 'oauth',
+                },
+              },
+            },
+          },
+        },
+      });
+
+      twitch
+        .get('users')
+        .auth(access_token, grant.twitch.key)
+        .request((err, res, body) => {
+          if (err) {
+            callback(err);
+          } else {
+            callback(null, {
+              username: body.data[0].login,
+              email: body.data[0].email,
+            });
+          }
+        });
+      break;
+    }
+    // [PTK] add apple sign in
+    // See https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens
+    case 'apple': {
+      const { id_token } = query;
+      unescapeAppleIdToken(id_token, callback);
+      break;
+    }
+
     default:
       callback({
         message: 'Unknown provider.',

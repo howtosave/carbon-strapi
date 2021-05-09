@@ -5,6 +5,8 @@ import useListView from '../../hooks/useListView';
 import CustomInputCheckbox from '../CustomInputCheckbox';
 import { Arrow, Thead } from './styledComponents';
 
+/* eslint-disable jsx-a11y/control-has-associated-label */
+
 function TableHeader({ headers, isBulkable }) {
   const {
     data,
@@ -26,10 +28,7 @@ function TableHeader({ headers, isBulkable }) {
               isAll
               name="all"
               onChange={onChangeBulkSelectall}
-              value={
-                data.length === entriesToDelete.length &&
-                entriesToDelete.length > 0
-              }
+              value={data.length === entriesToDelete.length && entriesToDelete.length > 0}
             />
           </th>
         )}
@@ -40,8 +39,7 @@ function TableHeader({ headers, isBulkable }) {
               onClick={() => {
                 if (header.sortable) {
                   const isCurrentSort = header.name === sortBy;
-                  const nextOrder =
-                    isCurrentSort && sortOrder === 'ASC' ? 'DESC' : 'ASC';
+                  const nextOrder = isCurrentSort && sortOrder === 'ASC' ? 'DESC' : 'ASC';
                   let value = `${header.name}:${nextOrder}`;
 
                   if (isCurrentSort && sortOrder === 'DESC') {
@@ -61,13 +59,13 @@ function TableHeader({ headers, isBulkable }) {
                 {header.label}
 
                 {sortBy === header.name && (
-                  <Arrow className={`${sortOrder === 'ASC' && 'isAsc'}`} />
+                  <Arrow fill="#212529" isUp={sortOrder === 'ASC' && 'isAsc'} />
                 )}
               </span>
             </th>
           );
         })}
-        <th></th>
+        <th />
       </tr>
     </Thead>
   );

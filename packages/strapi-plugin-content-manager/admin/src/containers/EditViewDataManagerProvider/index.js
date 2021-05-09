@@ -1,30 +1,24 @@
-import React, { useEffect, useReducer } from 'react';
-import { Prompt, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { cloneDeep, get, isEmpty, isEqual, set } from 'lodash';
-import {
-  request,
-  LoadingIndicatorPage,
-  useGlobalContext,
-} from 'strapi-helper-plugin';
-import pluginId from '../../pluginId';
+import PropTypes from 'prop-types';
+import React, { useEffect, useReducer, useState } from 'react';
+import { Prompt, useParams, useRouteMatch } from 'react-router-dom';
+import { LoadingIndicatorPage, request, useGlobalContext } from 'strapi-helper-plugin';
 import EditViewDataManagerContext from '../../contexts/EditViewDataManager';
-import createYupSchema from './utils/schema';
-import createDefaultForm from './utils/createDefaultForm';
-import getFilesToUpload from './utils/getFilesToUpload';
-import cleanData from './utils/cleanData';
-import getYupInnerErrors from './utils/getYupInnerErrors';
+import pluginId from '../../pluginId';
 import init from './init';
 import reducer, { initialState } from './reducer';
+import {
+  cleanData,
+  createDefaultForm,
+  createYupSchema,
+  getYupInnerErrors,
+  getFilesToUpload,
+  removePasswordFieldsFromData,
+} from './utils';
 
 const getRequestUrl = path => `/${pluginId}/explorer/${path}`;
 
-const EditViewDataManagerProvider = ({
-  allLayoutData,
-  children,
-  redirectToPreviousPage,
-  slug,
-}) => {
+const EditViewDataManagerProvider = ({ allLayoutData, children, redirectToPreviousPage, slug }) => {
   const { id } = useParams();
   // Retrieve the search
   const [reducerState, dispatch] = useReducer(reducer, initialState, init);
@@ -37,13 +31,15 @@ const EditViewDataManagerProvider = ({
     shouldShowLoadingState,
     shouldCheckErrors,
   } = reducerState.toJS();
-
+  const [isCreatingEntry, setIsCreatingEntry] = useState(id === 'create');
   const currentContentTypeLayout = get(allLayoutData, ['contentType'], {});
   const abortController = new AbortController();
   const { signal } = abortController;
-  const isCreatingEntry = id === 'create';
-
   const { emitEvent, formatMessage } = useGlobalContext();
+  const {
+    params: { contentType },
+  } = useRouteMatch('/plugins/content-manager/:contentType');
+  const isSingleType = contentType === 'singleType';
 
   useEffect(() => {
     if (!isLoading) {
@@ -55,31 +51,38 @@ const EditViewDataManagerProvider = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await request(getRequestUrl(`${slug}/${id}`), {
+        const data = await request(getRequestUrl(`${slug}/${id || ''}`), {
           method: 'GET',
           signal,
         });
 
         dispatch({
           type: 'GET_DATA_SUCCEEDED',
-          data,
+          data: removePasswordFieldsFromData(
+            data,
+            allLayoutData.contentType,
+            allLayoutData.components
+          ),
         });
       } catch (err) {
-        if (err.code !== 20) {
+        if (id && err.code !== 20) {
           strapi.notification.error(`${pluginId}.error.record.fetch`);
+        }
+        if (!id && err.response.status === 404) {
+          setIsCreatingEntry(true);
         }
       }
     };
 
-    const componentsDataStructure = Object.keys(
-      allLayoutData.components
-    ).reduce((acc, current) => {
+    const componentsDataStructure = Object.keys(allLayoutData.components).reduce((acc, current) => {
       acc[current] = createDefaultForm(
         get(allLayoutData, ['components', current, 'schema', 'attributes'], {}),
         allLayoutData.components
       );
+
       return acc;
     }, {});
+
     const contentTypeDataStructure = createDefaultForm(
       currentContentTypeLayout.schema.attributes,
       allLayoutData.components
@@ -107,13 +110,9 @@ const EditViewDataManagerProvider = ({
       abortController.abort();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, slug]);
+  }, [id, slug, isCreatingEntry]);
 
-  const addComponentToDynamicZone = (
-    keys,
-    componentUid,
-    shouldCheckErrors = false
-  ) => {
+  const addComponentToDynamicZone = (keys, componentUid, shouldCheckErrors = false) => {
     emitEvent('addComponentToDynamicZone');
     dispatch({
       type: 'ADD_COMPONENT_TO_DYNAMIC_ZONE',
@@ -139,11 +138,7 @@ const EditViewDataManagerProvider = ({
     });
   };
 
-  const addRepeatableComponentToField = (
-    keys,
-    componentUid,
-    shouldCheckErrors = false
-  ) => {
+  const addRepeatableComponentToField = (keys, componentUid, shouldCheckErrors = false) => {
     dispatch({
       type: 'ADD_REPEATABLE_COMPONENT_TO_FIELD',
       keys: keys.split('.'),
@@ -153,9 +148,13 @@ const EditViewDataManagerProvider = ({
   };
 
   const checkFormErrors = async (dataToSet = {}) => {
-    const schema = createYupSchema(currentContentTypeLayout, {
-      components: get(allLayoutData, 'components', {}),
-    });
+    const schema = createYupSchema(
+      currentContentTypeLayout,
+      {
+        components: get(allLayoutData, 'components', {}),
+      },
+      isCreatingEntry
+    );
     let errors = {};
     const updatedData = cloneDeep(modifiedData);
 
@@ -176,6 +175,7 @@ const EditViewDataManagerProvider = ({
           if (dzName !== modifiedDZName) {
             acc[current] = errors[current];
           }
+
           return acc;
         }, {});
       }
@@ -187,7 +187,7 @@ const EditViewDataManagerProvider = ({
     });
   };
 
-  const handleChange = ({ target: { name, value, type } }) => {
+  const handleChange = ({ target: { name, value, type } }, shouldSetInitialValue = false) => {
     let inputValue = value;
 
     // Empty string is not a valid date,
@@ -196,7 +196,22 @@ const EditViewDataManagerProvider = ({
       inputValue = null;
     }
 
-    if (type === 'biginteger' && value === '') {
+    if (type === 'password' && !value) {
+      dispatch({
+        type: 'REMOVE_PASSWORD_FIELD',
+        keys: name.split('.'),
+      });
+
+      return;
+    }
+
+    // Allow to reset enum
+    if (type === 'select-one' && value === '') {
+      inputValue = null;
+    }
+
+    // Allow to reset number input
+    if (type === 'number' && value === '') {
       inputValue = null;
     }
 
@@ -204,6 +219,7 @@ const EditViewDataManagerProvider = ({
       type: 'ON_CHANGE',
       keys: name.split('.'),
       value: inputValue,
+      shouldSetInitialValue,
     });
   };
 
@@ -211,9 +227,13 @@ const EditViewDataManagerProvider = ({
     e.preventDefault();
 
     // Create yup schema
-    const schema = createYupSchema(currentContentTypeLayout, {
-      components: get(allLayoutData, 'components', {}),
-    });
+    const schema = createYupSchema(
+      currentContentTypeLayout,
+      {
+        components: get(allLayoutData, 'components', {}),
+      },
+      isCreatingEntry
+    );
 
     try {
       // Validate the form using yup
@@ -243,7 +263,18 @@ const EditViewDataManagerProvider = ({
       // Change the request helper default headers so we can pass a FormData
       const headers = {};
       const method = isCreatingEntry ? 'POST' : 'PUT';
-      const endPoint = isCreatingEntry ? slug : `${slug}/${id}`;
+      let endPoint;
+
+      // All endpoints for creation and edition are the same for both content types
+      // But, the id from the URL didn't exist for the single types.
+      // So, we use the id of the modified data if this one is setted.
+      if (isCreatingEntry) {
+        endPoint = slug;
+      } else if (modifiedData) {
+        endPoint = `${slug}/${modifiedData.id}`;
+      } else {
+        endPoint = `${slug}/${id}`;
+      }
 
       emitEvent(isCreatingEntry ? 'willCreateEntry' : 'willEditEntry');
 
@@ -264,7 +295,13 @@ const EditViewDataManagerProvider = ({
         dispatch({
           type: 'SUBMIT_SUCCESS',
         });
-        redirectToPreviousPage();
+        strapi.notification.success(`${pluginId}.success.record.save`);
+
+        if (isSingleType) {
+          setIsCreatingEntry(false);
+        } else {
+          redirectToPreviousPage();
+        }
       } catch (err) {
         console.error({ err });
         const error = get(
@@ -334,9 +371,7 @@ const EditViewDataManagerProvider = ({
   };
 
   const shouldCheckDZErrors = dzName => {
-    const doesDZHaveError = Object.keys(formErrors).some(
-      key => key.split('.')[0] === dzName
-    );
+    const doesDZHaveError = Object.keys(formErrors).some(key => key.split('.')[0] === dzName);
     const shouldCheckErrors = !isEmpty(formErrors) && doesDZHaveError;
 
     return shouldCheckErrors;
@@ -372,6 +407,35 @@ const EditViewDataManagerProvider = ({
     dispatch({ type: 'IS_SUBMITTING', value });
   };
 
+  const deleteSuccess = () => {
+    dispatch({
+      type: 'DELETE_SUCCEEDED',
+    });
+  };
+
+  const resetData = () => {
+    dispatch({
+      type: 'RESET_DATA',
+    });
+  };
+
+  const clearData = () => {
+    if (isSingleType) {
+      setIsCreatingEntry(true);
+    }
+
+    dispatch({
+      type: 'SET_DEFAULT_MODIFIED_DATA_STRUCTURE',
+      contentTypeDataStructure: {},
+    });
+  };
+
+  const triggerFormValidation = () => {
+    dispatch({
+      type: 'TRIGGER_FORM_VALIDATION',
+    });
+  };
+
   const showLoader = !isCreatingEntry && isLoading;
 
   return (
@@ -383,11 +447,8 @@ const EditViewDataManagerProvider = ({
         addRepeatableComponentToField,
         allLayoutData,
         checkFormErrors,
-        deleteSuccess: () => {
-          dispatch({
-            type: 'DELETE_SUCCEEDED',
-          });
-        },
+        clearData,
+        deleteSuccess,
         formErrors,
         initialData,
         layout: currentContentTypeLayout,
@@ -402,14 +463,11 @@ const EditViewDataManagerProvider = ({
         removeComponentFromDynamicZone,
         removeComponentFromField,
         removeRepeatableField,
-        resetData: () => {
-          dispatch({
-            type: 'RESET_DATA',
-          });
-        },
+        resetData,
         setIsSubmitting,
         shouldShowLoadingState,
         slug,
+        triggerFormValidation,
       }}
     >
       {showLoader ? (

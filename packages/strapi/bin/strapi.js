@@ -49,7 +49,16 @@ const getLocalScript = name => (...args) => {
     process.exit(1);
   }
 
-  return require(cmdPath)(...args);
+  const script = require(cmdPath);
+
+  Promise.resolve()
+    .then(() => {
+      return script(...args);
+    })
+    .catch(error => {
+      console.error(`Error while running command ${name}: ${error.message}`);
+      process.exit(1);
+    });
 };
 
 /**
@@ -89,10 +98,7 @@ program
 program
   .command('new <directory>')
   .option('--no-run', 'Do not start the application after it is created')
-  .option(
-    '--use-npm',
-    'Force usage of npm instead of yarn to create the project'
-  )
+  .option('--use-npm', 'Force usage of npm instead of yarn to create the project')
   .option('--debug', 'Display database connection error')
   .option('--quickstart', 'Quickstart app creation')
   .option('--dbclient <dbclient>', 'Database client')
@@ -151,7 +157,6 @@ program
   .command('generate:model <id> [attributes...]')
   .option('-a, --api <api>', 'API name to generate a sub API')
   .option('-p, --plugin <api>', 'plugin name')
-  .option('-t, --tpl <template>', 'template name')
   .option('-c, --connection <connection>', 'The name of the connection to use')
   .description('generate a model for an API')
   .action((id, attributes, cliArguments) => {
@@ -185,11 +190,8 @@ program
 
 program
   .command('build')
-  .option(
-    '--no-optimization',
-    'Build the Administration without assets optimization',
-    false
-  )
+  .option('--clean', 'Remove the build and .cache folders', false)
+  .option('--no-optimization', 'Build the Administration without assets optimization', false)
   .description('Builds the strapi admin app')
   .action(getLocalScript('build'));
 
@@ -211,6 +213,19 @@ program
   .command('watch-admin')
   .description('Starts the admin dev server')
   .action(getLocalScript('watchAdmin'));
+
+program
+  .command('configuration:dump')
+  .alias('config:dump')
+  .option('-f, --file <file>', 'Output file, default output is stdout')
+  .action(getLocalScript('configurationDump'));
+
+program
+  .command('configuration:restore')
+  .alias('config:restore')
+  .option('-f, --file <file>', 'Input file, default input is stdin')
+  .option('-s, --strategy <strategy>', 'Strategy name, one of: "replace", "merge", "keep"')
+  .action(getLocalScript('configurationRestore'));
 
 /**
  * Normalize help argument

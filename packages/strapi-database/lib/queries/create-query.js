@@ -1,77 +1,80 @@
 'use strict';
 
-module.exports = function createQuery({ connectorQuery, model }) {
-  return new Query(connectorQuery, model);
+const { replaceIdByPrimaryKey } = require('../utils/primary-key');
+const { executeBeforeLifecycle, executeAfterLifecycle } = require('../utils/lifecycles');
+
+/**
+ * @param {Object} opts options
+ * @param {Object} opts.model The ORM model
+ * @param {Object} opts.connectorQuery The ORM queries implementation
+ */
+module.exports = function createQuery(opts) {
+  const { model, connectorQuery } = opts;
+
+  return {
+    get model() {
+      return model;
+    },
+
+    get orm() {
+      return model.orm;
+    },
+
+    get primaryKey() {
+      return model.primaryKey;
+    },
+
+    get associations() {
+      return model.associations;
+    },
+
+    /**
+     * Run custom database logic
+     */
+    custom(mapping) {
+      if (typeof mapping === 'function') {
+        return mapping.bind(this, { model: this.model });
+      }
+
+      if (!mapping[this.orm]) {
+        throw new Error(`Missing mapping for orm ${this.orm}`);
+      }
+
+      if (typeof mapping[this.orm] !== 'function') {
+        throw new Error(`Custom queries must be functions received ${typeof mapping[this.orm]}`);
+      }
+
+      return mapping[this.model.orm].call(this, { model: this.model });
+    },
+
+    create: createQueryWithLifecycles({ query: 'create', model, connectorQuery }),
+    update: createQueryWithLifecycles({ query: 'update', model, connectorQuery }),
+    delete: createQueryWithLifecycles({ query: 'delete', model, connectorQuery }),
+    find: createQueryWithLifecycles({ query: 'find', model, connectorQuery }),
+    findOne: createQueryWithLifecycles({ query: 'findOne', model, connectorQuery }),
+    count: createQueryWithLifecycles({ query: 'count', model, connectorQuery }),
+    search: createQueryWithLifecycles({ query: 'search', model, connectorQuery }),
+    countSearch: createQueryWithLifecycles({ query: 'countSearch', model, connectorQuery }),
+  };
 };
 
-class Query {
-  constructor(connectorQuery, model) {
-    this.connectorQuery = connectorQuery;
-    this.model = model;
-  }
+// wraps a connectorQuery call with:
+// - param substitution
+// - lifecycle hooks
+const createQueryWithLifecycles = ({ query, model, connectorQuery }) => async (params, ...rest) => {
+  // substitute id for primaryKey value in params
+  const newParams = replaceIdByPrimaryKey(params, model);
+  const queryArguments = [newParams, ...rest];
 
-  get orm() {
-    return this.model.orm;
-  }
+  // execute before hook
+  await executeBeforeLifecycle(query, model, ...queryArguments);
 
-  get primaryKey() {
-    return this.model.primaryKey;
-  }
+  // execute query
+  const result = await connectorQuery[query](...queryArguments);
 
-  get associations() {
-    return this.model.associations;
-  }
+  // execute after hook with result and arguments
+  await executeAfterLifecycle(query, model, result, ...queryArguments);
 
-  /**
-   * Run custom database logic
-   */
-  custom(mapping) {
-    if (typeof mapping === 'function') {
-      return mapping.bind(this, { model: this.model });
-    }
-
-    if (!mapping[this.orm]) {
-      throw new Error(`Missing mapping for orm ${this.orm}`);
-    }
-
-    if (typeof mapping[this.orm] !== 'function') {
-      throw new Error(
-        `Custom queries must be functions received ${typeof mapping[this.orm]}`
-      );
-    }
-
-    return mapping[this.model.orm].call(this, { model: this.model });
-  }
-
-  async find(...args) {
-    return this.connectorQuery.find(...args);
-  }
-
-  async findOne(...args) {
-    return this.connectorQuery.findOne(...args);
-  }
-
-  async create(...args) {
-    return this.connectorQuery.create(...args);
-  }
-
-  async update(...args) {
-    return this.connectorQuery.update(...args);
-  }
-
-  async delete(...args) {
-    return this.connectorQuery.delete(...args);
-  }
-
-  async count(...args) {
-    return this.connectorQuery.count(...args);
-  }
-
-  async search(...args) {
-    return this.connectorQuery.search(...args);
-  }
-
-  async countSearch(...args) {
-    return this.connectorQuery.countSearch(...args);
-  }
-}
+  // return result
+  return result;
+};

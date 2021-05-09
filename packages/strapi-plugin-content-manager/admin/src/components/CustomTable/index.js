@@ -1,31 +1,24 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
+import { useLocation, useHistory } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { upperFirst } from 'lodash';
-import pluginId from '../../pluginId';
+import { LoadingIndicator } from 'strapi-helper-plugin';
 import useListView from '../../hooks/useListView';
 import TableHeader from './TableHeader';
-import { Table, TableEmpty, TableRow } from './styledComponents';
+import { LoadingContainer, LoadingWrapper, Table, TableEmpty, TableRow } from './styledComponents';
 import ActionCollapse from './ActionCollapse';
 import Row from './Row';
 
-function CustomTable({
-  data,
-  headers,
-  history: {
-    location: { pathname, search },
-    push,
-  },
-  isBulkable,
-}) {
+const CustomTable = ({ data, headers, isBulkable, showLoader }) => {
   const {
     emitEvent,
     entriesToDelete,
     label,
     searchParams: { filters, _q },
-    slug,
   } = useListView();
+  const { pathname, search } = useLocation();
+  const { push } = useHistory();
 
   const redirectUrl = `redirectUrl=${pathname}${search}`;
   const colSpanLength = isBulkable ? headers.length + 2 : headers.length + 1;
@@ -33,7 +26,7 @@ function CustomTable({
   const handleGoTo = id => {
     emitEvent('willEditEntryFromList');
     push({
-      pathname: `/plugins/${pluginId}/${slug}/${id}`,
+      pathname: `${pathname}/${id}`,
       search: redirectUrl,
     });
   };
@@ -66,49 +59,50 @@ function CustomTable({
               handleGoTo(row.id);
             }}
           >
-            <Row
-              isBulkable={isBulkable}
-              headers={headers}
-              row={row}
-              goTo={handleGoTo}
-            />
+            <Row isBulkable={isBulkable} headers={headers} row={row} goTo={handleGoTo} />
           </TableRow>
         );
       })
     );
 
+  if (showLoader) {
+    return (
+      <>
+        <Table className="table">
+          <TableHeader headers={headers} isBulkable={isBulkable} />
+        </Table>
+        <LoadingWrapper>
+          <LoadingContainer>
+            <LoadingIndicator />
+          </LoadingContainer>
+        </LoadingWrapper>
+      </>
+    );
+  }
+
   return (
     <Table className="table">
       <TableHeader headers={headers} isBulkable={isBulkable} />
       <tbody>
-        {entriesToDelete.length > 0 && (
-          <ActionCollapse colSpan={colSpanLength} />
-        )}
+        {entriesToDelete.length > 0 && <ActionCollapse colSpan={colSpanLength} />}
         {content}
       </tbody>
     </Table>
   );
-}
+};
 
 CustomTable.defaultProps = {
   data: [],
   headers: [],
   isBulkable: true,
-  slug: '',
+  showLoader: false,
 };
 
 CustomTable.propTypes = {
   data: PropTypes.array,
   headers: PropTypes.array,
-  history: PropTypes.shape({
-    location: PropTypes.shape({
-      pathname: PropTypes.string,
-      search: PropTypes.string,
-    }),
-    push: PropTypes.func.isRequired,
-  }).isRequired,
   isBulkable: PropTypes.bool,
-  slug: PropTypes.string,
+  showLoader: PropTypes.bool,
 };
 
-export default withRouter(memo(CustomTable));
+export default memo(CustomTable);

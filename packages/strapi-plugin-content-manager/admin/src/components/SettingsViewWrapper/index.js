@@ -47,11 +47,11 @@ const SettingsViewWrapper = ({
       {
         color: 'cancel',
         onClick: toggleWarningCancel,
-        title: formatMessage({
+        label: formatMessage({
           id: `${pluginId}.popUpWarning.button.cancel`,
         }),
         type: 'button',
-        disabled: isEqual(modifiedData, initialData) ? true : false,
+        disabled: isEqual(modifiedData, initialData),
         style: {
           fontWeight: 600,
           paddingLeft: 15,
@@ -60,11 +60,11 @@ const SettingsViewWrapper = ({
       },
       {
         color: 'success',
-        title: formatMessage({
+        label: formatMessage({
           id: `${pluginId}.containers.Edit.submit`,
         }),
         type: 'submit',
-        disabled: isEqual(modifiedData, initialData) ? true : false,
+        disabled: isEqual(modifiedData, initialData),
         style: {
           minWidth: 150,
           fontWeight: 600,
@@ -163,16 +163,9 @@ const SettingsViewWrapper = ({
                   return (
                     <FormattedMessage key={input.name} id={input.label.id}>
                       {label => (
-                        <div
-                          className={input.customBootstrapClass}
-                          style={{ marginBottom: 1 }}
-                        >
+                        <div className={input.customBootstrapClass}>
                           <FormattedMessage
-                            id={get(
-                              input,
-                              'description.id',
-                              'app.utils.defaultMessage'
-                            )}
+                            id={get(input, 'description.id', 'app.utils.defaultMessage')}
                           >
                             {description => (
                               <Input
@@ -191,7 +184,7 @@ const SettingsViewWrapper = ({
                   );
                 })}
                 <div className="col-12">
-                  <Separator style={{ marginBottom: 23 }} />
+                  <Separator style={{ marginBottom: 20 }} />
                 </div>
               </div>
               <SectionTitle />

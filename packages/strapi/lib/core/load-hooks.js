@@ -1,7 +1,8 @@
 'use strict';
 
 // Dependencies.
-const fs = require('fs-extra');
+// [PTK] fse replacement
+const fs = require('./fs_extra');
 const path = require('path');
 const _ = require('lodash');
 const glob = require('../load/glob');

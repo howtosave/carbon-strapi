@@ -1,7 +1,8 @@
 'use strict';
 
 const path = require('path');
-const { existsSync } = require('fs-extra');
+// [PTK] fse replacement
+const { existsSync } = require('./fs_extra');
 const _ = require('lodash');
 const loadConfig = require('../load/load-config-files');
 const loadFiles = require('../load/load-files');

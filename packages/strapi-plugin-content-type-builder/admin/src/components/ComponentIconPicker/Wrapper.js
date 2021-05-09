@@ -2,11 +2,10 @@ import styled from 'styled-components';
 import { colors } from '@buffetjs/styles';
 import PropTypes from 'prop-types';
 
-const Wrapper = styled.div`
-  min-height: 199px;
-  margin-top: -2px;
-  margin-bottom: -2px;
+/* eslint-disable indent */
 
+const Wrapper = styled.div`
+  min-height: 198px;
   .collection {
     background-color: #fafafb;
     ${({ error }) => {
@@ -16,6 +15,8 @@ const Wrapper = styled.div`
           border-radius: 2px;
         `;
       }
+
+      return '';
     }}
 
     &:focus,
@@ -39,7 +40,6 @@ const Wrapper = styled.div`
 
   .search {
     display: flex;
-    padding-top: 2px;
     color: #919bae;
     > button {
       margin-top: -8px;
