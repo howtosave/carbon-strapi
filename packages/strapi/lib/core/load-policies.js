@@ -2,9 +2,9 @@
 
 const assert = require('assert');
 const path = require('path');
+const _ = require('lodash');
 // [PTK] fse replacement
 const fse = require('fs');
-const _ = require('lodash');
 
 module.exports = dir => {
   if (!fse.existsSync(dir)) return {};

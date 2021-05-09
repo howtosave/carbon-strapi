@@ -1,12 +1,12 @@
 'use strict';
 
 // [PTK] fse replacement
-const fs = require('./fs_extra');
+const fse = require('./fs_extra');
 
 const walk = require('./walk');
 
 const loadFunctions = dir => {
-  if (!fs.existsSync(dir)) return {};
+  if (!fse.existsSync(dir)) return {};
 
   return walk(dir, { loader: loadFunction });
 };

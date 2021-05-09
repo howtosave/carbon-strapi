@@ -12,11 +12,11 @@ dotenv.config({
 const os = require('os');
 const path = require('path');
 const _ = require('lodash');
-const dotenv = require('dotenv');
-
-dotenv.config({ path: process.env.ENV_PATH });
-
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+// [PTK] >>> remove dotenv
+//const dotenv = require('dotenv');
+//dotenv.config({ path: process.env.ENV_PATH });
+//process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+// <<<
 
 const getPrefixedDeps = require('../../utils/get-prefixed-dependencies');
 const loadPolicies = require('../load-policies');

@@ -1,8 +1,8 @@
 'use strict';
 
 const { join } = require('path');
-// [PTK] fse replacement
 const _ = require('lodash');
+// [PTK] fse replacement
 const { exists } = require('./fs_extra');
 const loadFiles = require('../load/load-files');
 

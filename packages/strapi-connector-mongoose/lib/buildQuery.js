@@ -248,7 +248,8 @@ const applyQueryParams = ({ model, query, filters }) => {
   // [PTK] Apply select param
   if (_.has(filters, 'select') && filters.select.length > 0) {
     query = query.select(filters.select.join(' '));
-    
+  }
+  
   // Apply publication state param
   if (_.has(filters, 'publicationState')) {
     const populateQuery = populateQueries.publicationState[filters.publicationState];

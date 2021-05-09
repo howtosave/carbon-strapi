@@ -11,7 +11,7 @@ const {
 
 const { ID_ATTRIBUTE } = constants;
 
-const sanitizeEntity = (dataSource, options) => {
+const sanitizeEntity = (dataSource, options, ignore) => {
   const { model, withPrivate = false, isOutput = true, includeFields = null } = options;
 
   if (typeof dataSource !== 'object' || _.isNil(dataSource)) {

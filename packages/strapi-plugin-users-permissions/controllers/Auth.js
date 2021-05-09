@@ -248,6 +248,7 @@ module.exports = {
       .get();
 
     const [requestPath] = ctx.request.url.split('?');
+    // [PK] if we have a prefix url, the provider value position in the url is [3]
     const provider = requestPath.split('/')[2] === 'connect' ? requestPath.split('/')[3] : requestPath.split('/')[2];
 
     if (!_.get(grantConfig[provider], 'enabled')) {
