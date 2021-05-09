@@ -20,7 +20,7 @@ const OnboardingVideos = () => {
   const { isLoading, isOpen, videos } = reducerState.toJS();
 
   useEffect(() => {
-    // [PTK] hide video
+    // [PK] hide video
     dispatch({
       type: 'HIDE_VIDEO_ONBOARDING',
     });

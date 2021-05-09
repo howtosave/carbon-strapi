@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const path = require('path');
-// [PTK] fse replacement
+// [PK] fse replacement
 const fse = require('./fs_extra');
 
 module.exports = function walk(dir, { loader } = {}) {

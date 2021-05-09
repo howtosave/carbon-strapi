@@ -2,7 +2,7 @@
 
 const { join } = require('path');
 const _ = require('lodash');
-// [PTK] fse replacement
+// [PK] fse replacement
 const { exists } = require('./fs_extra');
 const loadFiles = require('../load/load-files');
 

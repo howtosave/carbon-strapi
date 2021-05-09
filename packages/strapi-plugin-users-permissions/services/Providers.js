@@ -14,7 +14,7 @@ const purestConfig = require('@purest/providers');
 const { getAbsoluteServerUrl } = require('strapi-utils');
 const jwt = require('jsonwebtoken');
 
-// [PTK] parse id_token for apple sign in
+// [PK] parse id_token for apple sign in
 function base64urlUnescape(str) {
   str += new Array(5 - str.length % 4).join('=');
   return str.replace(/\-/g, '+').replace(/_/g, '/');
@@ -559,7 +559,7 @@ const getProfile = async (provider, query, callback) => {
       break;
     }
 
-    // [PTK] add apple sign in
+    // [PK] add apple sign in
     // See https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens
     case 'apple': {
       const { id_token } = query;

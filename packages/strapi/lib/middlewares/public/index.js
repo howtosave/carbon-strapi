@@ -81,7 +81,7 @@ module.exports = strapi => {
       if (!strapi.config.serveAdminPanel) return;
 
       const buildDir = path.resolve(strapi.dir, 'build');
-      // [PTK] fix prefix-url issue
+      // [PK] fix prefix-url issue
       // main router already has a prefix. so add a path w/o url prefix for static file service
       const adminPathWoPrefix = strapi.config.admin.path.replace(strapi.config.get('middleware.settings.router.prefix', ''), '');
 

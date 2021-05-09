@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies.
-// [PTK] fse replacement
+// [PK] fse replacement
 const fs = require('./fs_extra');
 const path = require('path');
 const _ = require('lodash');

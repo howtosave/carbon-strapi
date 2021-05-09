@@ -5,7 +5,7 @@ const { existsSync, readdirSync:fsReaddirSync, readJsonSync:fsReadJsonSync } = f
 const { access, readdir:fsReaddir, stat } = fs.promises;
 
 /**
- * [PTK] fs helper
+ * [PK] fs helper
  */
 
 module.exports = {

@@ -7,7 +7,7 @@ const _ = require('lodash');
 
 module.exports = strapi => ({
   initialize() {
-    // [PTK] fix overring upload directory issue
+    // [PK] fix overring upload directory issue
     const configPublicPath = strapi.config.paths.static || strapi.config.middleware.settings.public.path;
 
     const staticDir = resolve(strapi.dir, configPublicPath);

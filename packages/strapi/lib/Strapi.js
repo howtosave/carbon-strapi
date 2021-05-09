@@ -2,7 +2,7 @@
 
 const http = require('http');
 const path = require('path');
-// [PTK] fse replacement
+// [PK] fse replacement
 const fse = require('fs');
 const Koa = require('koa');
 const Router = require('koa-router');
@@ -319,14 +319,14 @@ class Strapi {
 
   async load() {
     if (process.env.NODE_ENV === 'development') {
-	this.app.use(async (ctx, next) => {
-	    if (ctx.request.url.endsWith('/_health') !== -1 && ['HEAD', 'GET'].includes(ctx.request.method)) {
-		ctx.set('strapi', 'You are so French!');
-		ctx.status = 204;
-	    } else {
-		await next();
-	    }
-	});
+      this.app.use(async (ctx, next) => {
+          if (ctx.request.url.endsWith('/_health') && ['HEAD', 'GET'].includes(ctx.request.method)) {
+        ctx.set('strapi', 'You are so French!');
+        ctx.status = 204;
+          } else {
+        await next();
+          }
+      });
     }
 
     const modules = await loadModules(this);

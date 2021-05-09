@@ -3,7 +3,7 @@
 const assert = require('assert');
 const path = require('path');
 const _ = require('lodash');
-// [PTK] fse replacement
+// [PK] fse replacement
 const fse = require('fs');
 
 module.exports = dir => {

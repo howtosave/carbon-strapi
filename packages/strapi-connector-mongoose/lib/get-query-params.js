@@ -66,7 +66,7 @@ module.exports = (value, type, key) => {
       result.key = `where.${key}.$nin`;
       result.value = _.castArray(value);
       break;
-    // [PTK] add _select for query projection
+    // [PK] add _select for query projection
     case '_select':
       result.key = 'select';
       result.value = value ? value.split(',') : [];

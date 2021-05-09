@@ -29,7 +29,7 @@ module.exports = strapi => {
 
       if (_.has(strapi.admin, 'config.routes')) {
         const router = new Router({
-          // [PTK] fix prefix-url issue
+          // [PK] fix prefix-url issue
           prefix: `${strapi.config.get('middleware.settings.router.prefix', '')}/admin`,
         });
 
@@ -46,7 +46,7 @@ module.exports = strapi => {
         _.forEach(strapi.plugins, (plugin, pluginName) => {
 
           const router = new Router({
-            // [PTK] fix prefix-url issue
+            // [PK] fix prefix-url issue
             prefix: `${strapi.config.get('middleware.settings.router.prefix', '')}/${pluginName}`,
           });
 
@@ -58,7 +58,7 @@ module.exports = strapi => {
             });
           });
 
-          // [PTK] router tracing
+          // [PK] router tracing
           //strapi.log.debug(">>>>>>>>>> PLUGIN ROUTER:", pluginName);
           //router.stack.forEach((item) => {
           //  strapi.log.debug('  ', item.methods, '\t', item.path);
