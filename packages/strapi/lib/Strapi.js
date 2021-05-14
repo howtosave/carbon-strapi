@@ -72,7 +72,8 @@ class Strapi {
 
     this.requireProjectBootstrap();
 
-    createUpdateNotifier(this).notify();
+    // [PK] remove createUpdateNotifier()
+    //createUpdateNotifier(this).notify();
   }
 
   get EE() {
@@ -241,8 +242,10 @@ class Strapi {
     const onListen = async err => {
       if (err) return this.stopWithError(err);
 
+      // [PK] remove unnecessary code
       // Is the project initialised?
-      const isInitialised = await utils.isInitialised(this);
+      const isInitialised = true; //await utils.isInitialised(this);
+      //
 
       // Should the startup message be displayed?
       const hideStartupMessage = process.env.STRAPI_HIDE_STARTUP_MESSAGE
