@@ -8,9 +8,7 @@
     "bin": "./bin"
   },
   "main": "./lib",
-  "bin": {
-    "strapi": "./bin/strapi.js"
-  },
+  "bin": "./bin/strapi.js",
   "dependencies": {
     "@koa/cors": "^3.0.0",
     "async": "^2.1.2",
