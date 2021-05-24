@@ -37,10 +37,12 @@ module.exports = (strapi) => {
         strapi.app.use(async (ctx, next) => {
           const start = Date.now();
           await next();
+
           const delta = Math.ceil(Date.now() - start);
-          strapi.log.debug(`${ctx.method} ${ctx.url} (${delta} ms) ${codeToColor(ctx.status)}`);
-          if (strapi.log.level === 'trace') {
-            if (ctx.request.length > 0) strapi.log.trace('req body:', ctx.body);
+          const userId = ctx.state && ctx.state.user && ctx.state.user.id;
+          strapi.log.debug(`${ctx.method} ${ctx.url} (${delta} ms) ${codeToColor(ctx.status)} > ${userId ? chalk.green(userId) : ''}`);
+          if (strapi.log.levelVal <= 10) { // trace
+            if (ctx.request.length > 0) strapi.log.trace('req body:', ctx.request.body);
             if (ctx.response.body) strapi.log.trace('res body:', ctx.response.body);
           }
         });
