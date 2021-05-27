@@ -40,7 +40,7 @@ module.exports = (strapi) => {
 
           const delta = Math.ceil(Date.now() - start);
           const userId = ctx.state && ctx.state.user && ctx.state.user.id;
-          strapi.log.debug(`${ctx.method} ${ctx.url} (${delta} ms) ${codeToColor(ctx.status)} > ${userId ? chalk.green(userId) : ''}`);
+          strapi.log.debug(`${codeToColor(ctx.status)} ${ctx.method} ${ctx.url} (${delta} ms) > ${userId ? chalk.gray(userId) : ''}`);
           if (strapi.log.levelVal <= 10) { // trace
             if (ctx.request.length > 0) strapi.log.trace('req body:', ctx.request.body);
             if (ctx.response.body) strapi.log.trace('res body:', ctx.response.body);

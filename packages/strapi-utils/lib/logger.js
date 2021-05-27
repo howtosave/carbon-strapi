@@ -31,16 +31,12 @@ function getBool(envVar, defaultValue) {
 const loggerConfig = {
   level: getLogLevel(),
   timestamp: getBool(process.env.STRAPI_LOG_TIMESTAMP, false),
-  // prettyPrint: getBool(process.env.STRAPI_LOG_PRETTY_PRINT, true),
   forceColor: getBool(process.env.STRAPI_LOG_FORCE_COLOR, true),
 };
 
 const pretty = pino.pretty({
   formatter: (logs, options) => {
-    return `${options.asColoredText(
-      { level: 10 },
-      `[${new Date().toISOString()}]`
-    )} ${options.prefix.toLowerCase()} ${logs.stack ? logs.stack : logs.msg}`;
+    return `${options.prefix} ${logs.stack ? logs.stack : logs.msg}`;
   },
 });
 
