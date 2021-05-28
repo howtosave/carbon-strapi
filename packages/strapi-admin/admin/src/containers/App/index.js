@@ -79,23 +79,8 @@ function App(props) {
         const { uuid } = data;
 
         if (uuid) {
-          try {
-            const deviceId = await getUID();
-
-            fetch('https://analytics.strapi.io/track', {
-              method: 'POST',
-              body: JSON.stringify({
-                event: 'didInitializeAdministration',
-                uuid,
-                deviceId,
-              }),
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            });
-          } catch (e) {
-            // Silent.
-          }
+          // [PK] removed useless code
+          data.deviceId = await getUID();
         }
 
         getDataRef.current(data);

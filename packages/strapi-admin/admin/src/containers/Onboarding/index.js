@@ -19,34 +19,10 @@ const OnboardingVideos = () => {
   const [reducerState, dispatch] = useReducer(reducer, initialState, init);
   const { isLoading, isOpen, videos } = reducerState.toJS();
 
-  useEffect(() => {
-    // [PK] hide video
-    dispatch({
-      type: 'HIDE_VIDEO_ONBOARDING',
-    });
-
-    const getData = async () => {
-      try {
-        const { data } = await axios.get('https://strapi.io/videos', {
-          timeout: 1000,
-        });
-        const { didWatchVideos, videos } = formatVideoArray(data);
-
-        dispatch({
-          type: 'GET_DATA_SUCCEEDED',
-          didWatchVideos,
-          videos,
-        });
-      } catch (err) {
-        console.error(err);
-        dispatch({
-          type: 'HIDE_VIDEO_ONBOARDING',
-        });
-      }
-    };
-
-    //getData();
-  }, []);
+  // [PK] removed useless code
+  dispatch({
+    type: 'HIDE_VIDEO_ONBOARDING',
+  });
 
   // Hide the player in case of request error
   if (isLoading) {
