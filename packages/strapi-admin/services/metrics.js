@@ -1,13 +1,11 @@
 'use strict';
 
 const sendDidInviteUser = async () => {
-  const numberOfUsers = await strapi.admin.services.user.count();
-  const numberOfRoles = await strapi.admin.services.role.count();
-  return strapi.telemetry.send('didInviteUser', { numberOfRoles, numberOfUsers });
+  // [PK] remove telemetry
 };
 
 const sendDidUpdateRolePermissions = async () => {
-  return strapi.telemetry.send('didUpdateRolePermissions');
+  // [PK] remove telemetry
 };
 
 module.exports = {

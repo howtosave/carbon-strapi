@@ -3,7 +3,7 @@
 const { getService } = require('../../utils');
 
 module.exports = async () => {
-  const { sendDidInitializeEvent } = getService('metrics');
+  // [PK] remove telemetry
   const { decorator } = getService('entity-service-decorator');
   const { initDefaultLocale } = getService('locales');
   const { sectionsBuilder, actions, conditions, engine } = getService('permissions');
@@ -31,7 +31,7 @@ module.exports = async () => {
   // Hooks & Models
   registerModelsHooks();
 
-  sendDidInitializeEvent();
+  // [PK] remove telemetry
 };
 
 const registerModelsHooks = () => {
