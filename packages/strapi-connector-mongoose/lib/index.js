@@ -38,11 +38,12 @@ const defaults = {
 const isMongooseConnection = ({ connector }) => connector === 'mongoose';
 
 const createConnectionURL = opts => {
-  const { protocol, auth, host, port } = opts;
+  // [PK] fix mongo connection issue
+  const { protocol, auth, host, port, database } = opts;
 
   return {
     toString() {
-      return `${protocol}://${auth}${host}${port}/`;
+      return `${protocol}://${auth}${host}${port}/${database}`;
     },
   };
 };
@@ -104,11 +105,13 @@ module.exports = function(strapi) {
       connectOptions.useUnifiedTopology = useUnifiedTopology || true;
 
       try {
+        // [PK] fix mongo connection issue
         const connectionURL = createConnectionURL({
           protocol: `mongodb${isSrv ? '+srv' : ''}`,
           port: isSrv ? '' : `:${port}`,
           host,
           auth: username ? `${username}:${encodeURIComponent(password)}@` : '',
+          database,
         });
 
         const connectionString = uri || connectionURL.toString();
