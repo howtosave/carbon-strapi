@@ -104,3 +104,4 @@ AUTHORS text
 *.woff binary
 *.pyc binary
 *.pdf binary
+*.min.js binary
