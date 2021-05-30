@@ -21,7 +21,7 @@ const sendDidConfigureListView = async (contentType, configuration) => {
   }
 
   try {
-    await strapi.telemetry.send('didConfigureListView', data);
+    // [PK] remove telemetry
   } catch (e) {
     // silence
   }

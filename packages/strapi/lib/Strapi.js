@@ -25,8 +25,9 @@ const { webhookModel, createWebhookStore } = require('./services/webhook-store')
 const { createCoreStore, coreStoreModel } = require('./services/core-store');
 const createEntityService = require('./services/entity-service');
 const entityValidator = require('./services/entity-validator');
-const createTelemetry = require('./services/metrics');
-const createUpdateNotifier = require('./utils/update-notifier');
+// [PK] remove telemetry
+// [PK] remove createUpdateNotifier()
+
 const ee = require('./utils/ee');
 
 const LIFECYCLES = {
@@ -73,7 +74,6 @@ class Strapi {
     this.requireProjectBootstrap();
 
     // [PK] remove createUpdateNotifier()
-    //createUpdateNotifier(this).notify();
   }
 
   get EE() {
@@ -230,7 +230,7 @@ class Strapi {
       await this.db.destroy();
     }
 
-    this.telemetry.destroy();
+    // [PK] remove telemetry
 
     delete global.strapi;
   }
@@ -260,15 +260,7 @@ class Strapi {
         }
       }
 
-      // Get database clients
-      const databaseClients = _.map(this.config.get('connections'), _.property('settings.client'));
-
-      // Emit started event.
-      await this.telemetry.send('didStartServer', {
-        database: databaseClients,
-        plugins: this.config.installedPlugins,
-        providers: this.config.installedProviders,
-      });
+      // [PK] remove telemetry
 
       if (cb && typeof cb === 'function') {
         cb();
@@ -323,12 +315,12 @@ class Strapi {
   async load() {
     if (process.env.NODE_ENV === 'development') {
       this.app.use(async (ctx, next) => {
-          if (ctx.request.url.endsWith('/_health') && ['HEAD', 'GET'].includes(ctx.request.method)) {
-        ctx.set('strapi', 'You are so French!');
-        ctx.status = 204;
-          } else {
-        await next();
-          }
+        if (ctx.request.url.endsWith('/_health') && ['HEAD', 'GET'].includes(ctx.request.method)) {
+          ctx.set('strapi', 'You are so French!');
+          ctx.status = 204;
+        } else {
+          await next();
+        }
       });
     }
 
@@ -376,7 +368,7 @@ class Strapi {
       entityValidator: this.entityValidator,
     });
 
-    this.telemetry = createTelemetry(this);
+    // [PK] remove telemetry
 
     // Initialize hooks and middlewares.
     await initializeMiddlewares.call(this);

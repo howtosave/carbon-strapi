@@ -1,22 +1,19 @@
 'use strict';
 
-// [PK] custom .env
+const os = require('os');
+const path = require('path');
+const _ = require('lodash');
+// [PK] replace .env
 const dotenv = require('dotenv');
+
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 dotenv.config({
   path: require('fs').existsSync(`.env.${process.env.NODE_ENV}.local`)
     ? `.env.${process.env.NODE_ENV}.local`
-    : `.env.${process.env.NODE_ENV}`,
+    : require('fs').existsSync(`.env.${process.env.NODE_ENV}`)
+    ? `.env.${process.env.NODE_ENV}`
+    : `.env`,
 });
-
-const os = require('os');
-const path = require('path');
-const _ = require('lodash');
-// [PK] >>> remove dotenv
-//const dotenv = require('dotenv');
-//dotenv.config({ path: process.env.ENV_PATH });
-//process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-// <<<
 
 const getPrefixedDeps = require('../../utils/get-prefixed-dependencies');
 const loadPolicies = require('../load-policies');
