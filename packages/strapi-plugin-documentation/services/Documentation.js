@@ -392,7 +392,7 @@ module.exports = {
           const { name, plugin } = routeTagConfig;
           const referencePlugin = !_.isEmpty(plugin);
 
-          key = referencePlugin ? `${plugin}-${name}` : name.toLowerCase();
+          key = referencePlugin ? `${plugin}-${name}` : (name ? name.toLowerCase() : apiName);
           tags = referencePlugin ? this.formatTag(plugin, name) : _.upperFirst(name);
         } else {
           key = routeTagConfig.toLowerCase();
