@@ -410,8 +410,8 @@ module.exports = {
         if (_.isObject(routeTagConfig)) {
           const { name, plugin } = routeTagConfig;
           const referencePlugin = !_.isEmpty(plugin);
-
-          key = referencePlugin ? `${plugin}-${name}` : name.toLowerCase();
+          // [PK] support partial tag info in routes.config.tag
+          key = referencePlugin ? `${plugin}-${name}` : (name ? name.toLowerCase() : apiName);
           tags = referencePlugin ? this.formatTag(plugin, name) : _.upperFirst(name);
         } else {
           key = routeTagConfig.toLowerCase();
