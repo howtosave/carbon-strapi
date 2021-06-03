@@ -12,9 +12,7 @@
     "strapi"
   ],
   "main": "./index.js",
-  "bin": {
-    "create-strapi-starter": "./index.js"
-  },
+  "bin": "./index.js",
   "dependencies": {
     "chalk": "4.1.1",
     "ci-info": "3.1.1",
