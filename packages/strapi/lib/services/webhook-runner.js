@@ -154,6 +154,4 @@ class WebhookRunner {
 /**
  * Expose a factory function instead of the class
  */
-module.exports = function createWebhookRunner(opts) {
-  return new WebhookRunner(opts);
-};
+module.exports = WebhookRunner;

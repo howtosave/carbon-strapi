@@ -30,4 +30,4 @@ class LifecycleManager {
   }
 }
 
-module.exports = () => new LifecycleManager();
+module.exports = LifecycleManager;

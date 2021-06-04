@@ -10,7 +10,7 @@ const _ = require('lodash');
 const chalk = require('chalk');
 const CLITable = require('cli-table3');
 const { logger, models, getAbsoluteAdminUrl, getAbsoluteServerUrl } = require('strapi-utils');
-const { createDatabaseManager } = require('strapi-database');
+const { DatabaseManager } = require('strapi-database');
 const loadConfiguration = require('./core/app-configuration');
 
 const utils = require('./utils');
@@ -19,8 +19,8 @@ const bootstrap = require('./core/bootstrap');
 const initializeMiddlewares = require('./middlewares');
 const initializeHooks = require('./hooks');
 const createStrapiFs = require('./core/fs');
-const createEventHub = require('./services/event-hub');
-const createWebhookRunner = require('./services/webhook-runner');
+const EventHub = require('./services/event-hub');
+const WebhookRunner = require('./services/webhook-runner');
 const { webhookModel, createWebhookStore } = require('./services/webhook-store');
 const { createCoreStore, coreStoreModel } = require('./services/core-store');
 const createEntityService = require('./services/entity-service');
@@ -69,11 +69,13 @@ class Strapi {
 
     // internal services.
     this.fs = createStrapiFs(this);
-    this.eventHub = createEventHub();
+    this.eventHub = new EventHub();
 
     this.requireProjectBootstrap();
 
     // [PK] remove createUpdateNotifier()
+
+    global.strapi = this;
   }
 
   get EE() {
@@ -336,7 +338,7 @@ class Strapi {
     await bootstrap(this);
 
     // init webhook runner
-    this.webhookRunner = createWebhookRunner({
+    this.webhookRunner = new WebhookRunner({
       eventHub: this.eventHub,
       logger: this.log,
       configuration: this.config.get('server.webhooks', {}),
@@ -346,7 +348,7 @@ class Strapi {
     this.models['core_store'] = coreStoreModel(this.config);
     this.models['strapi_webhooks'] = webhookModel(this.config);
 
-    this.db = createDatabaseManager(this);
+    this.db = new DatabaseManager(this);
 
     await this.runLifecyclesFunctions(LIFECYCLES.REGISTER);
     await this.db.initialize();
@@ -484,8 +486,4 @@ class Strapi {
   }
 }
 
-module.exports = options => {
-  const strapi = new Strapi(options);
-  global.strapi = strapi;
-  return strapi;
-};
+module.exports = Strapi;

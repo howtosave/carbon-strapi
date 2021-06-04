@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ESNEXT",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    // Read .js file
+    "allowJs": true,
+    // Generate d.ts files
+    "declaration": true,
+    // Output d.ts only
+    "emitDeclarationOnly": true,
+    // Output directory for d.ts files
+    "outFile": "./index.d.ts",
+  },
+  "exclude": [
+    "node_modules",
+    "tests", "bin",
+    "commands",
+    "test/helpers/*",
+    "**/__mockData__/**",
+    "**/__tests__/**",
+    "**/*.spec.js",
+    "**/*.test.js",
+    "**/admin/**",
+  ],
+  "include": ["packages/strapi/lib"]
+}

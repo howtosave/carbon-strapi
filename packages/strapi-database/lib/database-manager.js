@@ -6,8 +6,8 @@ const { createQuery } = require('./queries');
 const createConnectorRegistry = require('./connector-registry');
 const constants = require('./constants');
 const { validateModelSchemas } = require('./validation');
-const createMigrationManager = require('./migration-manager');
-const createLifecycleManager = require('./lifecycle-manager');
+const MigrationManager = require('./migration-manager');
+const LifecycleManager = require('./lifecycle-manager');
 
 class DatabaseManager {
   constructor(strapi) {
@@ -23,8 +23,8 @@ class DatabaseManager {
     this.queries = new Map();
     this.models = new Map();
 
-    this.migrations = createMigrationManager(this);
-    this.lifecycles = createLifecycleManager();
+    this.migrations = new MigrationManager(this);
+    this.lifecycles = new LifecycleManager();
   }
 
   async initialize() {
@@ -174,5 +174,5 @@ function createDatabaseManager(strapi) {
 }
 
 module.exports = {
-  createDatabaseManager,
+  DatabaseManager,
 };

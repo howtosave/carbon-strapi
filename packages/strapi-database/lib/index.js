@@ -1,7 +1,7 @@
 'use strict';
 
-const { createDatabaseManager } = require('./database-manager');
+const { DatabaseManager } = require('./database-manager');
 
 module.exports = {
-  createDatabaseManager,
+  DatabaseManager,
 };

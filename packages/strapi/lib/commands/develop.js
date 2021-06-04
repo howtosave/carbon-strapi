@@ -68,7 +68,7 @@ module.exports = async function({ build, watchAdmin, polling, browser }) {
     }
 
     if (cluster.isWorker) {
-      const strapiInstance = strapi({
+      const strapiInstance = new strapi({
         dir,
         autoReload: true,
         serveAdminPanel: watchAdmin ? false : true,
