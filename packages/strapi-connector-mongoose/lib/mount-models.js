@@ -306,6 +306,8 @@ module.exports = async ({ models, target }, ctx) => {
     const handleIndexesErrors = () => {
       Model.on('index', error => {
         if (error) {
+          // [PK] print more error information
+          strapi.log.error(error);
           if (error.code === 11000) {
             strapi.log.error(
               `Unique constraint fails, make sure to update your data and restart to apply the unique constraint.\n\t- ${error.message}`
