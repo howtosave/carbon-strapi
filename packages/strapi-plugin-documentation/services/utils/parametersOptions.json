@@ -130,5 +130,15 @@
       "items": { "type": "string" }
     },
     "deprecated": false
+  },
+  {
+    "name": "_locale",
+    "in": "query",
+    "required": false,
+    "description": "Get records that match the specified locale",
+    "schema": {
+      "type": "string"
+    },
+    "deprecated": false
   }
 ]
