@@ -55,6 +55,7 @@ module.exports = strapi => {
           const start = Date.now();
           await next();
           const delta = Math.ceil(Date.now() - start);
+          // [PK] print user.id and body of req/res
           const userId = ctx.state && ctx.state.user && ctx.state.user.id;
           strapi.log.debug(`${codeToColor(ctx.status)} ${ctx.method} ${ctx.url} (${delta} ms) > ${userId ? chalk.gray(userId) : ''}`);
           if (strapi.log.levelVal <= 10) { // trace

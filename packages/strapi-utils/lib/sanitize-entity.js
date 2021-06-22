@@ -11,7 +11,8 @@ const {
 
 const { ID_ATTRIBUTE } = constants;
 
-const sanitizeEntity = (dataSource, options, ignore) => {
+// [PK] add ignore parameter
+const sanitizeEntity = (dataSource, options, ignore = null) => {
   const { model, withPrivate = false, isOutput = true, includeFields = null } = options;
 
   if (typeof dataSource !== 'object' || _.isNil(dataSource)) {
@@ -25,7 +26,7 @@ const sanitizeEntity = (dataSource, options, ignore) => {
   }
 
   if (_.isArray(data)) {
-    return data.map(entity => sanitizeEntity(entity, options));
+    return data.map(entity => sanitizeEntity(entity, options, ignore));
   }
 
   if (_.isNil(model)) {
@@ -46,9 +47,7 @@ const sanitizeEntity = (dataSource, options, ignore) => {
     if (shouldRemoveAttribute(model, key, attribute, { withPrivate, isOutput })) {
       return acc;
     }
-    if (ignore && ignore.find(e => e === key)) {
-      return acc;
-    }
+    if (ignore && ignore.find(e => e === key)) return acc;
 
     // Relations
     const relation = attribute && (attribute.model || attribute.collection || attribute.component);

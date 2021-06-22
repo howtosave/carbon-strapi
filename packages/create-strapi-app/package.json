@@ -12,7 +12,9 @@
     "strapi"
   ],
   "main": "./index.js",
-  "bin": "./index.js",
+  "bin": {
+    "create-strapi-app": "./index.js"
+  },
   "files": [
     "create-strapi-app.js",
     "index.js"

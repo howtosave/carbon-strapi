@@ -4,15 +4,11 @@ const os = require('os');
 const path = require('path');
 const _ = require('lodash');
 // [PK] replace .env
-const dotenv = require('dotenv');
-
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-dotenv.config({
-  path: require('fs').existsSync(`.env.${process.env.NODE_ENV}.local`)
-    ? `.env.${process.env.NODE_ENV}.local`
-    : require('fs').existsSync(`.env.${process.env.NODE_ENV}`)
-    ? `.env.${process.env.NODE_ENV}`
-    : `.env`,
+require("dotenv").config({
+  path: process.env.NODE_ENV === "production" ? ".env"
+          : require("fs").existsSync(`.env.${process.env.NODE_ENV}.local`) 
+          ? `.env.${process.env.NODE_ENV}.local` : `.env.${process.env.NODE_ENV}`
 });
 
 const getPrefixedDeps = require('../../utils/get-prefixed-dependencies');

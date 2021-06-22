@@ -17,6 +17,7 @@ module.exports = {
       }
     };
     const configPublicPath = strapi.config.get(
+      // [PK] fix URL_PREFIX issue for upload
       'paths.static',
       strapi.config.middleware.settings.public.path
     );

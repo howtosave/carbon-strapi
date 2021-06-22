@@ -95,6 +95,7 @@ module.exports = async () => {
       callback: `${strapi.config.server.url}/auth/twitch/callback`,
       scope: ['user:read:email'],
     },
+    // [PK] add apple sign in
     apple: {
       enabled: false,
       icon: 'apple',
