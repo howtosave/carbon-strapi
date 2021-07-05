@@ -19,12 +19,7 @@ const sendDidConfigureListView = async (contentType, configuration) => {
       displayedRelationalFields,
     });
   }
-
-  try {
-    // [PK] remove telemetry
-  } catch (e) {
-    // silence
-  }
+  // [PK] remove telemetry
 };
 
 module.exports = {
