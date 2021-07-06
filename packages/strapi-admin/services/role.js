@@ -337,7 +337,8 @@ const assignPermissions = async (roleId, permissions = []) => {
     throw strapi.errors.badRequest('ValidationError', err);
   }
 
-  // [PK] remove telemetry
+  const superAdmin = await getService('role').getSuperAdmin();
+  const isSuperAdmin = superAdmin && superAdmin.id === roleId;
   const assignRole = set('role', roleId);
 
   const permissionsWithRole = permissions
@@ -372,7 +373,9 @@ const assignPermissions = async (roleId, permissions = []) => {
     permissionsToReturn.push(...createdPermissions.map(p => ({ ...p, role: p.role.id })));
   }
 
-  // [PK] remove telemetry
+  if (!isSuperAdmin && (permissionsToAdd.length || permissionsToDelete.length)) {
+    await getService('metrics').sendDidUpdateRolePermissions();
+  }
 
   return permissionsToReturn;
 };

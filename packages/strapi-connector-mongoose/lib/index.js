@@ -42,7 +42,7 @@ const createConnectionURL = opts => {
 
   return {
     toString() {
-      return `${protocol}://${auth}${host}${port}`;
+      return `${protocol}://${auth}${host}${port}/`;
     },
   };
 };
@@ -108,7 +108,7 @@ module.exports = function(strapi) {
           protocol: `mongodb${isSrv ? '+srv' : ''}`,
           port: isSrv ? '' : `:${port}`,
           host,
-          auth: username ? `${username}:${encodeURIComponent(password)}@` : ''
+          auth: username ? `${username}:${encodeURIComponent(password)}@` : '',
         });
 
         const connectionString = uri || connectionURL.toString();

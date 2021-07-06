@@ -55,7 +55,11 @@ module.exports = function createComponentBuilder() {
         .set('pluginOptions', infos.pluginOptions)
         .setAttributes(this.convertAttributes(infos.attributes));
 
-      // [PK] remove telemetry
+      if (this.components.size === 0) {
+        strapi.telemetry.send('didCreateFirstComponent');
+      } else {
+        strapi.telemetry.send('didCreateComponent');
+      }
 
       this.components.set(uid, handler);
 

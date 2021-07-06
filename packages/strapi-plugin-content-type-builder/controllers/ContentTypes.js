@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 
-// [PK] remove telemetry
+const { hasDraftAndPublish } = require('strapi-utils').contentTypes;
 
 const {
   validateContentTypeInput,
@@ -64,14 +64,23 @@ module.exports = {
         components: body.components,
       });
 
-      // [PK] remove telemetry
+      const metricsProperties = {
+        kind: contentType.kind,
+        hasDraftAndPublish: hasDraftAndPublish(contentType.schema),
+      };
+
+      if (_.isEmpty(strapi.api)) {
+        await strapi.telemetry.send('didCreateFirstContentType', metricsProperties);
+      } else {
+        await strapi.telemetry.send('didCreateContentType', metricsProperties);
+      }
 
       setImmediate(() => strapi.reload());
 
       ctx.send({ data: { uid: contentType.uid } }, 201);
     } catch (error) {
       strapi.log.error(error);
-      // [PK] remove telemetry
+      await strapi.telemetry.send('didNotCreateContentType', { error: error.message });
       ctx.send({ error: error.message }, 400);
     }
   },

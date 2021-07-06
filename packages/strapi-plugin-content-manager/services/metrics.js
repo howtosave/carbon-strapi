@@ -19,7 +19,12 @@ const sendDidConfigureListView = async (contentType, configuration) => {
       displayedRelationalFields,
     });
   }
-  // [PK] remove telemetry
+
+  try {
+    await strapi.telemetry.send('didConfigureListView', data);
+  } catch (e) {
+    // silence
+  }
 };
 
 module.exports = {

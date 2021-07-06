@@ -76,12 +76,7 @@ function App(props) {
       try {
         const { data } = await request('/admin/init', { method: 'GET' });
 
-        const { uuid } = data;
-
-        if (uuid) {
-          // [PK] removed useless code
-          data.deviceId = await getUID();
-        }
+        // [PK] remove telemetry
 
         getDataRef.current(data);
         setState({ isLoading: false, hasAdmin: data.hasAdmin });

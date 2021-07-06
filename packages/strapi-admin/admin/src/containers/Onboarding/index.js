@@ -19,7 +19,7 @@ const OnboardingVideos = () => {
   const [reducerState, dispatch] = useReducer(reducer, initialState, init);
   const { isLoading, isOpen, videos } = reducerState.toJS();
 
-  // [PK] removed useless code
+  // [PK] remove useless code
   dispatch({
     type: 'HIDE_VIDEO_ONBOARDING',
   });

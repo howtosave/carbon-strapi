@@ -78,7 +78,7 @@ module.exports = {
       const entity = await entityManager.create(sanitizeFn(body), model);
       ctx.body = permissionChecker.sanitizeOutput(entity);
 
-      // [PK] remove telemetry
+      await strapi.telemetry.send('didCreateFirstContentTypeEntry', { model });
     })();
   },
 

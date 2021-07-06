@@ -32,7 +32,15 @@ const generateFileName = name => {
   return `${baseName}_${randomSuffix()}`;
 };
 
-// [PK] remove telemetry
+const sendMediaMetrics = data => {
+  if (_.has(data, 'caption') && !_.isEmpty(data.caption)) {
+    strapi.telemetry.send('didSaveMediaWithCaption');
+  }
+
+  if (_.has(data, 'alternativeText') && !_.isEmpty(data.alternativeText)) {
+    strapi.telemetry.send('didSaveMediaWithAlternativeText');
+  }
+};
 
 const combineFilters = params => {
   // FIXME: until we support boolean operators for querying we need to make mime_ncontains use AND instead of OR
@@ -275,7 +283,7 @@ module.exports = {
     if (user) {
       fileValues[UPDATED_BY_ATTRIBUTE] = user.id;
     }
-    // [PK] remove telemetry
+    sendMediaMetrics(fileValues);
 
     const res = await strapi.query('file', 'upload').update(params, fileValues);
     const modelDef = strapi.getModel('file', 'upload');
@@ -289,7 +297,7 @@ module.exports = {
       fileValues[UPDATED_BY_ATTRIBUTE] = user.id;
       fileValues[CREATED_BY_ATTRIBUTE] = user.id;
     }
-    // [PK] remove telemetry
+    sendMediaMetrics(fileValues);
 
     const res = await strapi.query('file', 'upload').create(fileValues);
     const modelDef = strapi.getModel('file', 'upload');
@@ -378,7 +386,11 @@ module.exports = {
   },
 
   setSettings(value) {
-    // [PK] remove telemetry
+    if (value.responsiveDimensions === true) {
+      strapi.telemetry.send('didEnableResponsiveDimensions');
+    } else {
+      strapi.telemetry.send('didDisableResponsiveDimensions');
+    }
 
     return strapi
       .store({

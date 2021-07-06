@@ -29,7 +29,7 @@ const createTelemetryInstance = strapi => {
     destroy() {
       // [PK] remove telemetry
     },
-    async send(_, _) {
+    async send(_, __) {
       // [PK] remove telemetry
       return true;
     },

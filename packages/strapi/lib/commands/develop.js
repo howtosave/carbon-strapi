@@ -26,7 +26,7 @@ module.exports = async function({ build, watchAdmin, polling, browser }) {
   if (build && !watchAdmin && serveAdminPanel && !buildExists) {
     try {
       // [PK] change script name
-      execa.shellSync('npm run -s build:admin', {
+      execa.shellSync('npm run -s build:admin -- --no-optimization', {
         stdio: 'inherit',
       });
     } catch (err) {

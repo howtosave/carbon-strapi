@@ -136,7 +136,7 @@ module.exports = {
       roles: superAdminRole ? [superAdminRole.id] : [],
     });
 
-    // [PK] remove telemetry
+    await strapi.telemetry.send('didCreateFirstAdmin');
 
     ctx.body = {
       data: {

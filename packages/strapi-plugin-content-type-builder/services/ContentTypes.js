@@ -103,7 +103,7 @@ const createContentType = async ({ contentType, components = [] }, options = {})
 
   components.forEach(component => {
     const options = replaceTmpUIDs(targetContentType(component));
-
+    console.log(">>>>>>>>>>>>> UID:", component.uid);
     if (!_.has(component, 'uid')) {
       return builder.createComponent(options);
     }
