@@ -1,7 +1,6 @@
 'use strict';
 
-// [PK] fse replacement
-const fse = require('./fs_extra');
+const fse = require('fs-extra');
 
 const walk = require('./walk');
 

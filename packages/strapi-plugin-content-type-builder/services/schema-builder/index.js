@@ -30,11 +30,11 @@ module.exports = function createBuilder() {
 
     let dir;
     if (contentType.plugin) {
-      console.log(">>>>>>>>>>>>", contentType.plugin)
       dir = `./extensions/${contentType.plugin}/models`;
     } else {
       dir = `./api/${contentType.apiName}/models`;
     }
+
     return {
       modelName: contentType.modelName,
       plugin: contentType.plugin,

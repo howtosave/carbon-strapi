@@ -2,8 +2,7 @@
 
 const { join } = require('path');
 const _ = require('lodash');
-// [PK] fse replacement
-const { exists } = require('./fs_extra');
+const { exists } = require('fs-extra');
 const loadFiles = require('../load/load-files');
 
 module.exports = async strapi => {

@@ -1,8 +1,7 @@
 'use strict';
 
 const { join } = require('path');
-// [PK] fse replacement
-const { existsSync } = require('./fs_extra');
+const { existsSync } = require('fs-extra');
 const _ = require('lodash');
 const findPackagePath = require('../load/package-path');
 const loadFiles = require('../load/load-files');

@@ -2,8 +2,7 @@
 
 const assert = require('assert');
 const path = require('path');
-// [PK] fse replacement
-const fse = require('./fs_extra');
+const fse = require('fs-extra');
 
 module.exports = function walk(dir, { loader } = {}) {
   assert(typeof loader === 'function', 'opts.loader must be a function');

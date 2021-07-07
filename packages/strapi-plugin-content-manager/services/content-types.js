@@ -12,7 +12,7 @@ const configurationService = createConfigurationService({
   prefix: 'content_types',
   getModels() {
     const { toContentManagerModel } = getService('data-mapper');
-    //console.log(">>>>>>>>>", strapi.contentTypes["plugins::users-permissions.user"]);
+
     return mapValues(toContentManagerModel, strapi.contentTypes);
   },
 });

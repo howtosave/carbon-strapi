@@ -1,9 +1,8 @@
 'use strict';
 
 const path = require('path');
-// [PK] fse replacement
-const { existsSync } = require('./fs_extra');
-const fse = require('./fs_extra');
+const { existsSync } = require('fs-extra');
+const fse = require('fs-extra');
 const _ = require('lodash');
 const loadConfig = require('../load/load-config-files');
 const loadFiles = require('../load/load-files');

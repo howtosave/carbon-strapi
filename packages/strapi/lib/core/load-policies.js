@@ -3,8 +3,7 @@
 const assert = require('assert');
 const path = require('path');
 const _ = require('lodash');
-// [PK] fse replacement
-const fse = require('fs');
+const fse = require('fs-extra');
 
 module.exports = dir => {
   if (!fse.existsSync(dir)) return {};
