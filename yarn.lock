@@ -7528,7 +7528,7 @@ dot-prop@^5.1.0, dot-prop@^5.2.0:
   dependencies:
     is-obj "^2.0.0"
 
-dotenv@~8.2.0:
+dotenv@8.2.0:
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
   integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
@@ -11137,10 +11137,12 @@ is-utf8@^0.2.0:
   resolved "https://registry.yarnpkg.com/is-utf8/-/is-utf8-0.2.1.tgz#4b0da1442104d1b336340e80797e865cf39f7d72"
   integrity sha1-Sw2hRCEE0bM2NA6AeX6GXPOffXI=
 
-is-valid-domain@0.0.17:
-  version "0.0.17"
-  resolved "https://registry.yarnpkg.com/is-valid-domain/-/is-valid-domain-0.0.17.tgz#2cc19d576b4feebcf4ce5edd99dc8f0280e9d058"
-  integrity sha512-w0UWEXyrgPeWWwj9FVT14y4/dSIqWgjDkzxbsGDFpT+QRbyS9HTwwNvGus2IOR/03GzCpeChzSWK9Bo9WlStDA==
+is-valid-domain@0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/is-valid-domain/-/is-valid-domain-0.1.2.tgz#bd1b144716ca663df5996d62e2e7e45a971c7223"
+  integrity sha512-vm/9Ynw80MusgfSMffjGRuMhO8hjk5MOxLoFL7nYWvWXTPCxTGQtACiCwO055UqHICG8xP6hIvRXK1iwnuU9GA==
+  dependencies:
+    punycode "^2.1.1"
 
 is-whitespace@^0.3.0:
   version "0.3.0"
@@ -11709,6 +11711,11 @@ jmespath@0.15.0:
   version "0.15.0"
   resolved "https://registry.yarnpkg.com/jmespath/-/jmespath-0.15.0.tgz#a3f222a9aae9f966f5d27c796510e28091764217"
   integrity sha1-o/Iiqarp+Wb10nx5ZRDigJF2Qhc=
+
+jquery@1.9.1:
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-1.9.1.tgz#e4cd4835faaefbade535857613c0fc3ff2adaf34"
+  integrity sha1-5M1INfqu+63lNYV2E8D8P/KtrzQ=
 
 js-beautify@^1.6.12:
   version "1.13.13"
@@ -15375,7 +15382,7 @@ pluralize@^7.0.0:
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-7.0.0.tgz#298b89df8b93b0221dbf421ad2b1b1ea23fc6777"
   integrity sha512-ARhBOdzS3e41FbkW/XWrTEtukqqLoK5+Z/4UeDaLuSW+39JPeFgs4gCGqsrJHVZX0fUrx//4OF0K1CUGwlIFow==
 
-popper.js@^1.14.4:
+popper.js@^1.14.4, popper.js@^1.16.1:
   version "1.16.1"
   resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1.tgz#2a223cb3dc7b6213d740e40372be40de43e65b1b"
   integrity sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==
