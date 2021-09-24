@@ -284,7 +284,7 @@ module.exports = {
         null,
         formatError({
           id: 'Auth.form.error.email.format',
-          message: 'Please provide valid email address.',
+          message: 'Please provide a valid email address.',
         })
       );
     }
@@ -307,6 +307,17 @@ module.exports = {
         formatError({
           id: 'Auth.form.error.user.not-exist',
           message: 'This email does not exist.',
+        })
+      );
+    }
+
+    // User blocked
+    if (user.blocked) {
+      return ctx.badRequest(
+        null,
+        formatError({
+          id: 'Auth.form.error.user.blocked',
+          message: 'This user is disabled.',
         })
       );
     }
