@@ -29,10 +29,12 @@ module.exports = {
     const autoReload = strapi.config.get('autoReload', false);
     const strapiVersion = strapi.config.get('info.strapi', null);
     const nodeVersion = process.version;
+    const packageName = strapi.config.get('info.name', null);
+    const packageVersion = strapi.config.get('info.version', null);
     const communityEdition = !strapi.EE;
 
     return {
-      data: { currentEnvironment, autoReload, strapiVersion, nodeVersion, communityEdition },
+      data: { currentEnvironment, autoReload, strapiVersion, nodeVersion, communityEdition, packageName, packageVersion },
     };
   },
 

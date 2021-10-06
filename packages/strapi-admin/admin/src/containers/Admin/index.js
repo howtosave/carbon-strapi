@@ -62,7 +62,6 @@ export class Admin extends React.Component {
   };
 
   componentDidMount() {
-    this.emitEvent('didAccessAuthenticatedAdministration');
     this.initApp();
   }
 
@@ -84,25 +83,7 @@ export class Admin extends React.Component {
     this.props.setAppError();
   }
 
-  emitEvent = async (event, properties) => {
-    const {
-      global: { uuid },
-    } = this.props;
-
-    if (uuid) {
-      try {
-        await axios.post('https://analytics.strapi.io/track', {
-          event,
-          // PROJECT_TYPE is an env variable defined in the webpack config
-          // eslint-disable-next-line no-undef
-          properties: { ...properties, projectType: PROJECT_TYPE },
-          uuid,
-        });
-      } catch (err) {
-        // Silent
-      }
-    }
-  };
+  emitEvent = async () => {};
 
   fetchAppInfo = async () => {
     try {
@@ -115,60 +96,16 @@ export class Admin extends React.Component {
     }
   };
 
-  fetchStrapiLatestRelease = async () => {
-    const {
-      global: { strapiVersion },
-      getStrapiLatestReleaseSucceeded,
-    } = this.props;
-
-    if (!STRAPI_UPDATE_NOTIF) {
-      return;
-    }
-
-    try {
-      const {
-        data: { tag_name },
-      } = await axios.get('https://api.github.com/repos/strapi/strapi/releases/latest');
-      const shouldUpdateStrapi = checkLatestStrapiVersion(strapiVersion, tag_name);
-
-      getStrapiLatestReleaseSucceeded(tag_name, shouldUpdateStrapi);
-
-      const showUpdateNotif = !JSON.parse(localStorage.getItem('STRAPI_UPDATE_NOTIF'));
-
-      if (!showUpdateNotif) {
-        return;
-      }
-
-      if (shouldUpdateStrapi) {
-        strapi.notification.toggle({
-          type: 'info',
-          message: { id: 'notification.version.update.message' },
-          link: {
-            url: `https://github.com/strapi/strapi/releases/tag/${tag_name}`,
-            label: {
-              id: 'notification.version.update.link',
-            },
-          },
-          blockTransition: true,
-          onClose: () => localStorage.setItem('STRAPI_UPDATE_NOTIF', true),
-        });
-      }
-    } catch (err) {
-      // Silent
-    }
-  };
-
-  hasApluginNotReady = props => {
+  hasApluginNotReady = (props) => {
     const {
       global: { plugins },
     } = props;
 
-    return !Object.keys(plugins).every(plugin => plugins[plugin].isReady === true);
+    return !Object.keys(plugins).every((plugin) => plugins[plugin].isReady === true);
   };
 
   initApp = async () => {
     await this.fetchAppInfo();
-    await this.fetchStrapiLatestRelease();
   };
 
   /**
@@ -197,7 +134,7 @@ export class Admin extends React.Component {
     }, []);
   };
 
-  renderPluginDispatcher = props => {
+  renderPluginDispatcher = (props) => {
     // NOTE: Send the needed props instead of everything...
 
     return <PluginDispatcher {...this.props} {...props} {...this.helpers} />;
@@ -205,7 +142,7 @@ export class Admin extends React.Component {
 
   renderRoute = (props, Component) => <Component {...this.props} {...props} />;
 
-  setUpdateMenu = updateMenuFn => {
+  setUpdateMenu = (updateMenuFn) => {
     this.setState({ updateMenu: updateMenuFn });
   };
 
@@ -269,7 +206,7 @@ export class Admin extends React.Component {
               <Header />
               <Content>
                 <Switch>
-                  <Route path="/" render={props => this.renderRoute(props, HomePage)} exact />
+                  <Route path="/" render={(props) => this.renderRoute(props, HomePage)} exact />
                   <Route path="/me" component={ProfilePage} />
                   <Route path="/plugins/:pluginId" render={this.renderPluginDispatcher} />
                   <Route path="/list-plugins" exact>
