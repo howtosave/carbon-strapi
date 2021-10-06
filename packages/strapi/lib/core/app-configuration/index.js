@@ -77,7 +77,7 @@ module.exports = (dir, initialConfig = {}) => {
     autoReload,
     environment: process.env.NODE_ENV,
     uuid: _.get(pkgJSON, 'strapi.uuid'),
-    packageJsonStrapi: _.omit(_.get(pkgJSON, 'strapi', {}), 'uuid'),
+    // [PK] removed useless codes ==>
     info: {
       ...pkgJSON,
       strapi: strapiVersion,
