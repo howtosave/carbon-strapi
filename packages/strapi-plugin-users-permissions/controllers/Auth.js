@@ -250,7 +250,10 @@ module.exports = {
 
     const [requestPath] = ctx.request.url.split('?');
     // [PK] if we have a prefix url, the provider value position in the url is [3]
-    const provider = requestPath.split('/')[2] === 'connect' ? requestPath.split('/')[3] : requestPath.split('/')[2];
+    // /connect/:provider/... or /prefix/connect/:provider/...
+    const paths = requestPath.split('/');
+    const grantPrefix = `${paths[2] === 'connect' ? '/' + paths[1] : ''}/connect`;
+    const provider = paths[2] === 'connect' ? paths[3] : paths[2];
 
     if (!_.get(grantConfig[provider], 'enabled')) {
       return ctx.badRequest(null, 'This provider is disabled.' + provider);
@@ -268,7 +271,14 @@ module.exports = {
       'users-permissions'
     ].services.providers.buildRedirectUri(provider);
 
-    return grant(grantConfig)(ctx, next);
+    strapi.log.debug('provider config:', grantConfig[provider]);
+
+    return grant({
+      defaults: {
+        prefix: grantPrefix,
+      },
+      ...grantConfig,
+    })(ctx, next);
   },
 
   async forgotPassword(ctx) {
