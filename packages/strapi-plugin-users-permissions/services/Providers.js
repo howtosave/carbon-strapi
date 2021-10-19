@@ -16,7 +16,7 @@ const jwt = require('jsonwebtoken');
 
 // [PK] parse id_token for apple sign in
 function base64urlUnescape(str) {
-  str += new Array(5 - str.length % 4).join('=');
+  str += new Array(5 - (str.length % 4)).join('=');
   return str.replace(/\-/g, '+').replace(/_/g, '/');
 }
 function unescapeAppleIdToken(idToken, cb) {
@@ -26,7 +26,7 @@ function unescapeAppleIdToken(idToken, cb) {
   try {
     // parse body only
     const body = JSON.parse(Buffer.from(base64urlUnescape(segments[1]), 'base64'));
-    if (new Date(body.exp*1000) < new Date()) {
+    if (new Date(body.exp * 1000) < new Date()) {
       return cb(new Error('Jwt is expired'));
     }
 
@@ -34,8 +34,7 @@ function unescapeAppleIdToken(idToken, cb) {
       username: body.email.split('@')[0],
       email: body.email,
     });
-  } 
-  catch(e) {
+  } catch (e) {
     return cb(e);
   }
 }
@@ -83,7 +82,7 @@ const connect = (provider, query) => {
           })
           .get();
 
-        const user = _.find(users, { provider });
+        let user = _.find(users, { provider });
 
         if (_.isEmpty(user) && !advanced.allow_register) {
           return resolve([
@@ -97,14 +96,14 @@ const connect = (provider, query) => {
           return resolve([user, null]);
         }
 
-        if (
-          !_.isEmpty(_.find(users, user => user.provider !== provider)) &&
-          advanced.unique_email
-        ) {
+        user = _.find(users, (user) => user.provider !== provider);
+        if (!_.isEmpty(user) && advanced.unique_email) {
           return resolve([
             null,
-            [{ messages: [{ id: 'Auth.form.error.email.taken' }] }],
-            'Email is already taken.',
+            {
+              id: 'Auth.form.error.email.taken',
+              message: 'Email already taken via ' + user.provider,
+            },
           ]);
         }
 
@@ -285,7 +284,7 @@ const getProfile = async (provider, query, callback) => {
               return callback(null, {
                 username: userbody.login,
                 email: Array.isArray(emailsbody)
-                  ? emailsbody.find(email => email.primary === true).email
+                  ? emailsbody.find((email) => email.primary === true).email
                   : null,
               });
             });
