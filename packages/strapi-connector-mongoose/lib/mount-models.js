@@ -53,26 +53,19 @@ module.exports = async ({ models, target }, ctx) => {
         };
       }
 
-      const isPrivate = !_.get(definition, 'options.populateCreatorFields', false);
+      // [PTK] fix creator fields population issue
+      const autoPopulate = _.get(definition, 'options.populateCreatorFields', false);
 
-      definition.attributes[CREATED_BY_ATTRIBUTE] = {
+      definition.attributes[CREATED_BY_ATTRIBUTE] = definition.attributes[UPDATED_BY_ATTRIBUTE] = {
         model: 'user',
         plugin: 'admin',
         configurable: false,
         writable: false,
         visible: false,
-        private: isPrivate,
+        private: !autoPopulate,
+        autoPopulate,
       };
-
-      definition.attributes[UPDATED_BY_ATTRIBUTE] = {
-        model: 'user',
-        plugin: 'admin',
-        configurable: false,
-        writable: false,
-        visible: false,
-        private: isPrivate,
-      };
-    }
+   }
 
     const componentAttributes = Object.keys(definition.attributes).filter(key =>
       ['component', 'dynamiczone'].includes(definition.attributes[key].type)
