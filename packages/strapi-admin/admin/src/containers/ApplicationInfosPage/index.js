@@ -8,9 +8,12 @@ import { BaselineAlignment } from 'strapi-helper-plugin';
 import Bloc from '../../components/Bloc';
 import PageTitle from '../../components/SettingsPageTitle';
 import makeSelectApp from '../App/selectors';
+// [PK] customize app-info page
 import { Detail, InfoText } from './components';
 
 const makeSelectAppInfos = () => createSelector(makeSelectApp(), appState => appState.appInfos);
+
+// [PK] customize app-info page
 
 const ApplicationInfosPage = () => {
   const { formatMessage } = useIntl();

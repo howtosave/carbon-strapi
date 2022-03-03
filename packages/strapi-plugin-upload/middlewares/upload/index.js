@@ -7,7 +7,7 @@ const _ = require('lodash');
 
 module.exports = strapi => ({
   initialize() {
-    // [PK] fix overring upload directory issue
+    // [PK] fix overriding upload directory issue
     const configPublicPath = strapi.config.get(
       'paths.static',
       strapi.config.middleware.settings.public.path
