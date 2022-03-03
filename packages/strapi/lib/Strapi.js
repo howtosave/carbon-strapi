@@ -25,7 +25,7 @@ const { createCoreStore, coreStoreModel } = require('./services/core-store');
 const createEntityService = require('./services/entity-service');
 const entityValidator = require('./services/entity-validator');
 const createTelemetry = require('./services/metrics');
-const createUpdateNotifier = require('./utils/update-notifier');
+// [PK] removed update-notifier
 const ee = require('./utils/ee');
 
 const LIFECYCLES = {
@@ -71,7 +71,7 @@ class Strapi {
 
     this.requireProjectBootstrap();
 
-    createUpdateNotifier(this).notify();
+    // [PK] removed update-notifier
   }
 
   get EE() {
@@ -259,12 +259,7 @@ class Strapi {
       // Get database clients
       const databaseClients = _.map(this.config.get('connections'), _.property('settings.client'));
 
-      // Emit started event.
-      await this.telemetry.send('didStartServer', {
-        database: databaseClients,
-        plugins: this.config.installedPlugins,
-        providers: this.config.installedProviders,
-      });
+      // [PK] removed telemetry
 
       if (cb && typeof cb === 'function') {
         cb();
@@ -317,6 +312,8 @@ class Strapi {
   }
 
   async load() {
+    // [PK] /_health router only when development
+    this.config.environment === 'development' &&
     this.app.use(async (ctx, next) => {
       if (ctx.request.url === '/_health' && ['HEAD', 'GET'].includes(ctx.request.method)) {
         ctx.set('strapi', 'You are so French!');

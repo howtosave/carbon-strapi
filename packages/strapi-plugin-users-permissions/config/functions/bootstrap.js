@@ -139,6 +139,15 @@ module.exports = async () => {
       scope: ['openid email'], // scopes should be space delimited
       subdomain: 'my.subdomain.com/cas',
     },
+    // [PK] add apple sign in
+    apple: {
+      enabled: false,
+      icon: 'apple',
+      key: '',
+      secret: '',
+      callback: `${strapi.config.server.url}/auth/apple/callback`,
+      scope: ['name email'],
+    },
   };
   const prevGrantConfig = (await pluginStore.get({ key: 'grant' })) || {};
   // store grant auth config to db

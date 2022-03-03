@@ -17,7 +17,7 @@ module.exports = async ({ clean, optimization }) => {
 
   const { serverUrl, adminPath } = getConfigUrls(config.get('server'), true);
 
-  console.log(`Building your admin UI with ${green(config.environment)} configuration ...`);
+  console.log(`Building your admin UI... server url: ${green(serverUrl)}, adminPath: ${green(adminPath)}`);
 
   if (clean) {
     await strapiAdmin.clean({ dir });

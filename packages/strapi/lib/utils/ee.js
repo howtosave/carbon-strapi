@@ -14,7 +14,8 @@ const noLog = {
   info: noop,
 };
 
-const internals = {};
+// [PK] hack EE
+const internals = { isEE: true, licenseInfo: { type: "silver" } };
 const features = {
   bronze: [],
   silver: [],

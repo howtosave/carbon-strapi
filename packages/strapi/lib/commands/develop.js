@@ -25,7 +25,8 @@ module.exports = async function({ build, watchAdmin, polling, browser }) {
   // Don't run the build process if the admin is in watch mode
   if (build && !watchAdmin && serveAdminPanel && !buildExists) {
     try {
-      execa.shellSync('npm run -s build -- --no-optimization', {
+       // [PK] change script name
+      execa.shellSync('npm run -s build:admin -- --no-optimization', {
         stdio: 'inherit',
       });
     } catch (err) {

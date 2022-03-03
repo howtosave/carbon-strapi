@@ -30,9 +30,12 @@ module.exports = {
     const strapiVersion = strapi.config.get('info.strapi', null);
     const nodeVersion = process.version;
     const communityEdition = !strapi.EE;
-
+    // [PK] add package info
+    const appPackageName = strapi.config.get('info.name', null);
+    const appPackageVersion = strapi.config.get('info.version', null);
+    
     return {
-      data: { currentEnvironment, autoReload, strapiVersion, nodeVersion, communityEdition },
+      data: { currentEnvironment, autoReload, strapiVersion, nodeVersion, communityEdition, appPackageName, appPackageVersion },
     };
   },
 

@@ -3,12 +3,14 @@
 const os = require('os');
 const path = require('path');
 const _ = require('lodash');
-const dotenv = require('dotenv');
-
-dotenv.config({ path: process.env.ENV_PATH });
-
+// [PK] replace .env
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-
+require("dotenv").config({
+  path: process.env.NODE_ENV === "production" ? ".env"
+  : require("fs").existsSync(`.env.${process.env.NODE_ENV}.local`) 
+  ? `.env.${process.env.NODE_ENV}.local` : `.env.${process.env.NODE_ENV}`
+});
+  
 const getPrefixedDeps = require('../../utils/get-prefixed-dependencies');
 const loadPolicies = require('../load-policies');
 const loadFunctions = require('../load-functions');
@@ -75,7 +77,7 @@ module.exports = (dir, initialConfig = {}) => {
     autoReload,
     environment: process.env.NODE_ENV,
     uuid: _.get(pkgJSON, 'strapi.uuid'),
-    packageJsonStrapi: _.omit(_.get(pkgJSON, 'strapi', {}), 'uuid'),
+    // [PK] removed useless codes ==>
     info: {
       ...pkgJSON,
       strapi: strapiVersion,

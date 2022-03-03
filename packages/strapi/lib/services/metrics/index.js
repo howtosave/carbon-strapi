@@ -23,56 +23,14 @@ const LIMITED_EVENTS = [
 ];
 
 const createTelemetryInstance = strapi => {
-  const { uuid } = strapi.config;
-  const isDisabled = !uuid || isTruthy(process.env.STRAPI_TELEMETRY_DISABLED);
+  // [PK] removed telemetry
 
-  const crons = [];
-  const sender = createSender(strapi);
-  const sendEvent = wrapWithRateLimit(sender, { limitedEvents: LIMITED_EVENTS });
-
-  if (!isDisabled) {
-    const pingCron = scheduleJob('0 0 12 * * *', () => sendEvent('ping'));
-    crons.push(pingCron);
-
-    strapi.app.use(createMiddleware({ sendEvent }));
-  }
-
-  if (strapi.EE === true && ee.isEE === true) {
-    const pingDisabled =
-      isTruthy(process.env.STRAPI_LICENSE_PING_DISABLED) && ee.licenseInfo.type === 'gold';
-
-    const sendLicenseCheck = () => {
-      return sendEvent(
-        'didCheckLicense',
-        {
-          licenseInfo: {
-            ...ee.licenseInfo,
-            projectHash: hashProject(strapi),
-            dependencyHash: hashDep(strapi),
-          },
-        },
-        {
-          headers: { 'x-strapi-project': 'enterprise' },
-        }
-      );
-    };
-
-    if (!pingDisabled) {
-      const licenseCron = scheduleJob('0 0 0 * * 7', () => sendLicenseCheck());
-      crons.push(licenseCron);
-
-      sendLicenseCheck();
-    }
-  }
 
   return {
     destroy() {
-      // clear open handles
-      crons.forEach(cron => cron.cancel());
     },
-    async send(event, payload) {
-      if (isDisabled) return true;
-      return sendEvent(event, payload);
+    async send() {
+      return true;
     },
   };
 };

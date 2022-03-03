@@ -14,6 +14,31 @@ const purestConfig = require('@purest/providers');
 const { getAbsoluteServerUrl } = require('strapi-utils');
 const jwt = require('jsonwebtoken');
 
+// [PK] parse id_token for apple sign in
+function base64urlUnescape(str) {
+  str += new Array(5 - (str.length % 4)).join('=');
+  return str.replace(/\-/g, '+').replace(/_/g, '/');
+}
+function unescapeAppleIdToken(idToken, cb) {
+  // Jwt format: header . body . signature
+  var segments = idToken.split('.');
+  if (segments.length > 3) return cb(new Error('Jwt cannot be parsed'));
+  try {
+    // parse body only
+    const body = JSON.parse(Buffer.from(base64urlUnescape(segments[1]), 'base64'));
+    if (new Date(body.exp * 1000) < new Date()) {
+      return cb(new Error('Jwt is expired'));
+    }
+  
+    cb(null, {
+      username: body.email.split('@')[0],
+      email: body.email,
+    });
+  } catch (e) {
+    return cb(e);
+  }
+}
+  
 /**
  * Connect thanks to a third-party provider.
  *
@@ -581,6 +606,15 @@ const getProfile = async (provider, query, callback) => {
         });
       break;
     }
+
+    // [PK] add apple sign in
+    // See https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens
+    case 'apple': {
+      const { id_token } = query;
+      unescapeAppleIdToken(id_token, callback);
+      break;
+    }
+    
     default:
       callback(new Error('Unknown provider.'));
       break;
