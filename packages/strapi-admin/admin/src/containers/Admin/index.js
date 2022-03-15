@@ -22,8 +22,7 @@ import {
   CheckPagePermissions,
   request,
 } from 'strapi-helper-plugin';
-import { SETTINGS_BASE_URL, SHOW_TUTORIALS, STRAPI_UPDATE_NOTIF } from '../../config';
-import { checkLatestStrapiVersion } from '../../utils';
+import { SETTINGS_BASE_URL } from '../../config';
 
 import adminPermissions from '../../permissions';
 import Header from '../../components/Header/index';
@@ -33,7 +32,6 @@ import InstalledPluginsPage from '../InstalledPluginsPage';
 import HomePage from '../HomePage';
 import MarketplacePage from '../MarketplacePage';
 import NotFoundPage from '../NotFoundPage';
-import OnboardingVideos from '../Onboarding';
 import PermissionsManager from '../PermissionsManager';
 import PluginDispatcher from '../PluginDispatcher';
 import ProfilePage from '../ProfilePage';
@@ -240,7 +238,6 @@ export class Admin extends React.Component {
               isOpen={blockApp && showGlobalAppBlocker}
               {...overlayBlockerData}
             />
-            {SHOW_TUTORIALS && <OnboardingVideos />}
           </Wrapper>
         </GlobalContextProvider>
       </PermissionsManager>
