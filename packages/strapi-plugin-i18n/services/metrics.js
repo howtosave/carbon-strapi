@@ -1,23 +1,13 @@
 'use strict';
 
-const { reduce } = require('lodash/fp');
-const { getService } = require('../utils');
+// [PK] removed telemetry
 
 const sendDidInitializeEvent = async () => {
-  const { isLocalizedContentType } = getService('content-types');
-
-  const numberOfContentTypes = reduce(
-    (sum, contentType) => (isLocalizedContentType(contentType) ? sum + 1 : sum),
-    0
-  )(strapi.contentTypes);
-
-  await strapi.telemetry.send('didInitializeI18n', { numberOfContentTypes });
+// [PK] removed telemetry
 };
 
 const sendDidUpdateI18nLocalesEvent = async () => {
-  const numberOfLocales = await getService('locales').count();
-
-  await strapi.telemetry.send('didUpdateI18nLocales', { numberOfLocales });
+// [PK] removed telemetry
 };
 
 module.exports = {

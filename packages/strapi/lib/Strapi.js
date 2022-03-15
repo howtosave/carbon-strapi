@@ -228,8 +228,6 @@ class Strapi {
       await this.db.destroy();
     }
 
-    this.telemetry.destroy();
-
     delete global.strapi;
   }
 
@@ -255,9 +253,6 @@ class Strapi {
           this.logStartupMessage();
         }
       }
-
-      // Get database clients
-      const databaseClients = _.map(this.config.get('connections'), _.property('settings.client'));
 
       // [PK] removed telemetry
 
@@ -366,8 +361,6 @@ class Strapi {
       eventHub: this.eventHub,
       entityValidator: this.entityValidator,
     });
-
-    this.telemetry = createTelemetry(this);
 
     // Initialize hooks and middlewares.
     await initializeMiddlewares.call(this);
